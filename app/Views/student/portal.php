@@ -14,7 +14,7 @@
     <nav class="bg-indigo-600 text-white shadow-md p-4">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <h1 class="text-2xl font-bold">Student Portal</h1>
-            <a href="/" class="hover:text-indigo-200 transition-colors">Home</a>
+            <a href="/logout" class="hover:text-indigo-200 transition-colors font-semibold">Logout</a>
         </div>
     </nav>
     <div class="max-w-6xl mx-auto p-8 mt-8">

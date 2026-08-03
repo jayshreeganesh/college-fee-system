@@ -20,6 +20,10 @@ if ($uri === '/' || $uri === '/index.php') {
 } elseif ($uri === '/login') {
     $controller = new \App\Controllers\AdminController();
     $controller->login();
+} elseif ($uri === '/logout') {
+    session_destroy();
+    header('Location: /');
+    exit;
 } elseif ($uri === '/admin') {
     $controller = new \App\Controllers\AdminController();
     $controller->dashboard();

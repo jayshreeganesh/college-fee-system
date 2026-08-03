@@ -14,7 +14,7 @@
     <nav class="bg-slate-900 text-white shadow-md p-4">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <h1 class="text-2xl font-bold tracking-tight">Admin Dashboard</h1>
-            <a href="/" class="text-sm font-semibold hover:text-slate-300 transition-colors">Logout / Home</a>
+            <a href="/logout" class="text-sm font-semibold hover:text-slate-300 transition-colors">Logout / Home</a>
         </div>
     </nav>
     
