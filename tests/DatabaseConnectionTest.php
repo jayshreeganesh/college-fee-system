@@ -9,15 +9,12 @@ class DatabaseConnectionTest extends TestCase
 {
     public function testSQLiteConnectionIsSuccessful(): void
     {
-        // This test ensures we can create an SQLite connection in-memory for testing
-        // or a file-based one for development.
-        
         // Arrange
         $dsn = 'sqlite::memory:';
         
         // Act
-        $pdo = new PDO($dsn);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $db = new \App\Database\DatabaseConnection($dsn);
+        $pdo = $db->getPdo();
         
         // Assert
         $this->assertInstanceOf(PDO::class, $pdo);
