@@ -12,6 +12,10 @@ class StudentController
         $error = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+                die('CSRF token validation failed.');
+            }
+
             $enrollment_number = $_POST['enrollment_number'] ?? '';
             $password = $_POST['password'] ?? '';
 

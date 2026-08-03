@@ -25,6 +25,7 @@
                 <p class="text-slate-500 mt-1">Record a new student fee transaction</p>
             </div>
             <form action="/admin/payment" method="POST" class="p-8 space-y-6">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Student</label>
                     <select name="student_id" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all" required>

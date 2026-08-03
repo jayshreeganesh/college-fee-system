@@ -22,6 +22,7 @@
             </div>
         <?php endif; ?>
         <form action="/login" method="POST" class="space-y-6">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-2">Username</label>
                 <input type="text" name="username" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all" placeholder="Enter username" required>

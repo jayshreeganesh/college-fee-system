@@ -13,6 +13,10 @@ class AdminController
         $error = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+                die('CSRF token validation failed.');
+            }
+
             $username = $_POST['username'] ?? '';
             $password = $_POST['password'] ?? '';
 
@@ -138,9 +142,20 @@ class AdminController
         $amount = $_POST['amount'] ?? null;
         $status = $_POST['status'] ?? 'paid';
 
-        if ($student_id && $fee_category_id && $amount) {
+        if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+            die('CSRF token validation failed.');
+        }
+
+        if ($student_id && $fee_category_id && $amount !== null && (float) $amount > 0) {
             $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
             $pdo = $db->getPdo();
+
+            // Validate student_id exists
+            $stmt = $pdo->prepare('SELECT id FROM students WHERE id = ?');
+            $stmt->execute([(int) $student_id]);
+            if (!$stmt->fetch()) {
+                die('Invalid student ID.');
+            }
 
             $tx = new \App\Models\Transaction();
             $tx->student_id = (int) $student_id;

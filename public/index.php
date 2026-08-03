@@ -2,6 +2,10 @@
 
 session_start();
 
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // 1. Define Base Path for easy file inclusion
 define('BASE_PATH', dirname(__DIR__));
 
@@ -44,7 +48,6 @@ if ($uri === '/' || $uri === '/index.php') {
     $controller = new \App\Controllers\StudentController();
     $controller->portal();
 } else {
-    // 404 Not Found
     http_response_code(404);
-    echo "<h1>404 - Page Not Found</h1>";
+    require_once BASE_PATH . '/app/Views/errors/404.php';
 }
