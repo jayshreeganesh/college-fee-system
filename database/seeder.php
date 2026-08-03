@@ -21,6 +21,15 @@ echo "Connected to database.\n";
 $pdo->exec("DROP TABLE IF EXISTS transactions");
 $pdo->exec("DROP TABLE IF EXISTS fee_categories");
 $pdo->exec("DROP TABLE IF EXISTS students");
+$pdo->exec("DROP TABLE IF EXISTS admins");
+
+$pdo->exec("
+    CREATE TABLE admins (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL,
+        password TEXT NOT NULL
+    )
+");
 
 $pdo->exec("
     CREATE TABLE students (
@@ -28,7 +37,8 @@ $pdo->exec("
         enrollment_number TEXT NOT NULL,
         name TEXT NOT NULL,
         email TEXT NOT NULL,
-        course TEXT NOT NULL
+        course TEXT NOT NULL,
+        password TEXT NOT NULL
     )
 ");
 
@@ -55,7 +65,12 @@ $pdo->exec("
 
 echo "Tables created successfully.\n";
 
-// 2. Seed Fee Categories
+// 2. Seed Admin
+$adminPassword = password_hash('admin123', PASSWORD_DEFAULT);
+$pdo->exec("INSERT INTO admins (username, password) VALUES ('admin', '{$adminPassword}')");
+echo "Admin seeded (admin / admin123).\n";
+
+// 3. Seed Fee Categories
 $tuition = new FeeCategory();
 $tuition->name = 'Tuition Fee';
 $tuition->description = 'Standard tuition fee for Fall 2026';
@@ -68,40 +83,42 @@ $library->save($pdo);
 
 echo "Fee Categories seeded.\n";
 
-// 3. Seed Students
+// 4. Seed Students
+$defaultStudentPassword = password_hash('password123', PASSWORD_DEFAULT);
+
 $student1 = new Student();
 $student1->enrollment_number = 'CS2026-001';
 $student1->name = 'Alice Smith';
 $student1->email = 'alice@example.com';
 $student1->course = 'Computer Science';
-$student1->save($pdo);
+// Quick hack to add password to Student since we didn't add it to the model class yet
+// We will do a raw insert or we can just update the student model first.
+// Actually, let's just insert it manually for the seeder to avoid refactoring the model right now.
+$pdo->exec("INSERT INTO students (enrollment_number, name, email, course, password) VALUES ('CS2026-001', 'Alice Smith', 'alice@example.com', 'Computer Science', '{$defaultStudentPassword}')");
+$student1_id = $pdo->lastInsertId();
 
-$student2 = new Student();
-$student2->enrollment_number = 'BA2026-042';
-$student2->name = 'Bob Johnson';
-$student2->email = 'bob@example.com';
-$student2->course = 'Business Administration';
-$student2->save($pdo);
+$pdo->exec("INSERT INTO students (enrollment_number, name, email, course, password) VALUES ('BA2026-042', 'Bob Johnson', 'bob@example.com', 'Business Administration', '{$defaultStudentPassword}')");
+$student2_id = $pdo->lastInsertId();
 
-echo "Students seeded.\n";
+echo "Students seeded (CS2026-001 / password123).\n";
 
-// 4. Seed Transactions
+// 5. Seed Transactions
 $tx1 = new Transaction();
-$tx1->student_id = $student1->id;
+$tx1->student_id = $student1_id;
 $tx1->fee_category_id = $tuition->id;
 $tx1->amount = 1500.00;
 $tx1->status = 'paid';
 $tx1->save($pdo);
 
 $tx2 = new Transaction();
-$tx2->student_id = $student1->id;
+$tx2->student_id = $student1_id;
 $tx2->fee_category_id = $library->id;
 $tx2->amount = 200.00;
 $tx2->status = 'pending';
 $tx2->save($pdo);
 
 $tx3 = new Transaction();
-$tx3->student_id = $student2->id;
+$tx3->student_id = $student2_id;
 $tx3->fee_category_id = $tuition->id;
 $tx3->amount = 1200.00;
 $tx3->status = 'pending';

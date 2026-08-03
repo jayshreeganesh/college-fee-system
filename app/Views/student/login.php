@@ -16,16 +16,21 @@
             <h2 class="text-3xl font-bold text-indigo-900">Student Portal</h2>
             <p class="text-slate-500 mt-2">Sign in to check your fee status</p>
         </div>
-        <form action="#" method="POST" class="space-y-6">
+        <?php if (!empty($error)): ?>
+            <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-center font-semibold text-sm">
+                <?php echo htmlspecialchars($error); ?>
+            </div>
+        <?php endif; ?>
+        <form action="/student/login" method="POST" class="space-y-6">
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-2">Enrollment Number</label>
-                <input type="text" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all" placeholder="e.g. CS2026-001">
+                <input type="text" name="enrollment_number" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all" placeholder="e.g. CS2026-001" required>
             </div>
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-2">Password</label>
-                <input type="password" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all" placeholder="••••••••">
+                <input type="password" name="password" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all" placeholder="••••••••" required>
             </div>
-            <button type="button" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition-all duration-200">
+            <button type="submit" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition-all duration-200">
                 Log In
             </button>
         </form>
