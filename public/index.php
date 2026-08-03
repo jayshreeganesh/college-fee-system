@@ -5,14 +5,8 @@
 // 1. Define Base Path for easy file inclusion
 define('BASE_PATH', dirname(__DIR__));
 
-// 2. Simple Auto-loader for Controllers and Models
-spl_autoload_register(function ($class_name) {
-    // Convert namespace backslashes to directory separators
-    $file = BASE_PATH . '/' . str_replace('\\', '/', $class_name) . '.php';
-    if (file_exists($file)) {
-        require_once $file;
-    }
-});
+// 2. Load Composer Autoloader
+require_once BASE_PATH . '/vendor/autoload.php';
 
 // 3. Very Basic Router
 // In a real MVC, we use a Router class, but this demonstrates the concept
@@ -22,7 +16,7 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 // Since we will run this via 'php -S localhost:8000', $uri is just '/'
 if ($uri === '/' || $uri === '/index.php') {
     // Route to HomeController
-    $controller = new \app\Controllers\HomeController();
+    $controller = new \App\Controllers\HomeController();
     $controller->index();
 } else {
     // 404 Not Found
