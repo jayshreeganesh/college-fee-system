@@ -169,4 +169,49 @@ class AdminController
         header('Location: /admin');
         exit;
     }
+
+    public function addStudent()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        $pageTitle = "Add Student - College Fee System";
+        require_once BASE_PATH . '/app/Views/admin/add_student.php';
+    }
+
+    public function storeStudent()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+            die('CSRF token validation failed.');
+        }
+
+        $enrollment = trim($_POST['enrollment_number'] ?? '');
+        $name = trim($_POST['name'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $course = trim($_POST['course'] ?? '');
+        $password = $_POST['password'] ?? '';
+
+        if ($enrollment && $name && $email && $course && $password) {
+            $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+            $pdo = $db->getPdo();
+
+            // Hash the password
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+            // Using raw insert because we added password to schema but our active record Model doesn't explicitly map all fields if not defined
+            // Alternatively, just do raw insert for safety.
+            $stmt = $pdo->prepare('INSERT INTO students (enrollment_number, name, email, course, password) VALUES (?, ?, ?, ?, ?)');
+            $stmt->execute([$enrollment, $name, $email, $course, $hashedPassword]);
+        }
+
+        header('Location: /admin');
+        exit;
+    }
 }
