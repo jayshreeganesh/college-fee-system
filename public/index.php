@@ -1,6 +1,6 @@
 <?php
 
-// C:\php-mysql-prj\college-fee-system\public\index.php
+session_start();
 
 // 1. Define Base Path for easy file inclusion
 define('BASE_PATH', dirname(__DIR__));
@@ -19,6 +19,9 @@ if ($uri === '/' || $uri === '/index.php') {
     $controller->index();
 } elseif ($uri === '/login') {
     $controller = new \App\Controllers\AdminController();
+    $controller->login();
+} elseif ($uri === '/student/login') {
+    $controller = new \App\Controllers\StudentController();
     $controller->login();
 } elseif ($uri === '/student') {
     $controller = new \App\Controllers\StudentController();
