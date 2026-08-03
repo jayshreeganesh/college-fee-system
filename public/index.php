@@ -20,6 +20,12 @@ if ($uri === '/' || $uri === '/index.php') {
 } elseif ($uri === '/login') {
     $controller = new \App\Controllers\AdminController();
     $controller->login();
+} elseif ($uri === '/admin') {
+    $controller = new \App\Controllers\AdminController();
+    $controller->dashboard();
+} elseif ($uri === '/admin/export') {
+    $controller = new \App\Controllers\AdminController();
+    $controller->export();
 } elseif ($uri === '/student/login') {
     $controller = new \App\Controllers\StudentController();
     $controller->login();
