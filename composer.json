@@ -1,0 +1,12 @@
+{
+    "name": "college/fee-system",
+    "authors": [
+        {
+            "name": "jayshreeganesh",
+            "email": "jayshreeganesh@users.noreply.github.com"
+        }
+    ],
+    "require-dev": {
+        "phpunit/phpunit": "^13.2"
+    }
+}
