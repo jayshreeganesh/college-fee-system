@@ -1,4 +1,5 @@
 <?php
+
 // C:\php-mysql-prj\college-fee-system\public\index.php
 
 // 1. Define Base Path for easy file inclusion

@@ -4,3 +4,4 @@
 /.env
 *.sqlite
 *.sqlite3
+.php-cs-fixer.cache
