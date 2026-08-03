@@ -15,9 +15,14 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 // Strip the base directory if running in a subfolder like XAMPP
 // Since we will run this via 'php -S localhost:8000', $uri is just '/'
 if ($uri === '/' || $uri === '/index.php') {
-    // Route to HomeController
     $controller = new \App\Controllers\HomeController();
     $controller->index();
+} elseif ($uri === '/login') {
+    $controller = new \App\Controllers\AdminController();
+    $controller->login();
+} elseif ($uri === '/student') {
+    $controller = new \App\Controllers\StudentController();
+    $controller->portal();
 } else {
     // 404 Not Found
     http_response_code(404);
