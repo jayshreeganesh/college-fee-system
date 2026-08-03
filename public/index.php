@@ -26,6 +26,13 @@ if ($uri === '/' || $uri === '/index.php') {
 } elseif ($uri === '/admin/export') {
     $controller = new \App\Controllers\AdminController();
     $controller->export();
+} elseif ($uri === '/admin/payment') {
+    $controller = new \App\Controllers\AdminController();
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $controller->storePayment();
+    } else {
+        $controller->addPayment();
+    }
 } elseif ($uri === '/student/login') {
     $controller = new \App\Controllers\StudentController();
     $controller->login();

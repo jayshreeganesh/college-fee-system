@@ -108,4 +108,50 @@ class AdminController
         unlink($zipFile);
         exit;
     }
+
+    public function addPayment()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+        $pdo = $db->getPdo();
+
+        $students = $pdo->query('SELECT id, name, enrollment_number FROM students')->fetchAll(PDO::FETCH_ASSOC);
+        $categories = $pdo->query('SELECT id, name FROM fee_categories')->fetchAll(PDO::FETCH_ASSOC);
+
+        $pageTitle = "Add Payment - College Fee System";
+        require_once BASE_PATH . '/app/Views/admin/add_payment.php';
+    }
+
+    public function storePayment()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        $student_id = $_POST['student_id'] ?? null;
+        $fee_category_id = $_POST['fee_category_id'] ?? null;
+        $amount = $_POST['amount'] ?? null;
+        $status = $_POST['status'] ?? 'paid';
+
+        if ($student_id && $fee_category_id && $amount) {
+            $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+            $pdo = $db->getPdo();
+
+            $tx = new \App\Models\Transaction();
+            $tx->student_id = (int) $student_id;
+            $tx->fee_category_id = (int) $fee_category_id;
+            $tx->amount = (float) $amount;
+            $tx->status = $status;
+
+            $tx->save($pdo);
+        }
+
+        header('Location: /admin');
+        exit;
+    }
 }
