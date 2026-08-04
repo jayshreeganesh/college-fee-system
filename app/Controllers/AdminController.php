@@ -64,8 +64,62 @@ class AdminController
             LIMIT 5
         ')->fetchAll(PDO::FETCH_ASSOC);
 
+        // Fetch Data for ApexCharts (Revenue by Category)
+        $chartDataQuery = $pdo->query('
+            SELECT f.name as category, SUM(t.amount) as total
+            FROM transactions t
+            JOIN fee_categories f ON t.fee_category_id = f.id
+            WHERE t.status = "paid"
+            GROUP BY f.id
+        ')->fetchAll(PDO::FETCH_ASSOC);
+
+        $chartLabels = json_encode(array_column($chartDataQuery, 'category'));
+        $chartSeries = json_encode(array_map('floatval', array_column($chartDataQuery, 'total')));
+
         $pageTitle = "Admin Dashboard";
         require_once BASE_PATH . '/app/Views/admin/dashboard.php';
+    }
+
+    public function reports()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+        $pdo = $db->getPdo();
+
+        $statusFilter = $_GET['status'] ?? '';
+        $courseFilter = $_GET['course'] ?? '';
+
+        $query = '
+            SELECT t.amount, t.status, t.created_at, s.name as student_name, s.course, f.name as fee_name 
+            FROM transactions t 
+            JOIN students s ON t.student_id = s.id 
+            JOIN fee_categories f ON t.fee_category_id = f.id 
+            WHERE 1=1
+        ';
+        $params = [];
+
+        if ($statusFilter) {
+            $query .= ' AND t.status = ?';
+            $params[] = $statusFilter;
+        }
+
+        if ($courseFilter) {
+            $query .= ' AND s.course LIKE ?';
+            $params[] = '%' . $courseFilter . '%';
+        }
+
+        $query .= ' ORDER BY t.created_at DESC';
+
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
+        $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $pageTitle = "Advanced Reports";
+        require_once BASE_PATH . '/app/Views/admin/reports.php';
     }
 
     public function export()

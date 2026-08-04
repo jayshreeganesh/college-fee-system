@@ -34,6 +34,9 @@ if ($uri === '/' || $uri === '/index.php') {
 } elseif ($uri === '/admin/export') {
     $controller = new \App\Controllers\AdminController();
     $controller->export();
+} elseif ($uri === '/admin/reports') {
+    $controller = new \App\Controllers\AdminController();
+    $controller->reports();
 } elseif ($uri === '/admin/payment') {
     $controller = new \App\Controllers\AdminController();
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {

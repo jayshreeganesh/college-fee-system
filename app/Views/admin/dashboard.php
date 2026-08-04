@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($pageTitle ?? 'Admin Dashboard'); ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Outfit', sans-serif; }
@@ -33,6 +34,10 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     Add Payment
                 </a>
+                <a href="/admin/reports" class="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md transition-all transform hover:-translate-y-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Reports
+                </a>
                 <a href="/admin/export" class="flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition-all transform hover:-translate-y-1">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                     Export Data
@@ -54,8 +59,13 @@
                 <p class="text-4xl font-extrabold text-rose-500 mt-2">$<?php echo number_format($totalPending, 2); ?></p>
             </div>
         </div>
+            
+            <div class="mt-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                <h3 class="text-xl font-bold text-slate-800 mb-4">Revenue by Fee Category</h3>
+                <div id="revenueChart" class="w-full h-80"></div>
+            </div>
 
-        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+            <div class="mt-8 bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
             <div class="px-8 py-6 border-b border-slate-100 bg-slate-50/50">
                 <h3 class="text-lg font-bold text-slate-800">Recent Transactions</h3>
             </div>
@@ -92,5 +102,46 @@
             <?php endif; ?>
         </div>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var options = {
+                series: <?php echo $chartSeries; ?>,
+                labels: <?php echo $chartLabels; ?>,
+                chart: {
+                    type: 'donut',
+                    height: 350,
+                    fontFamily: 'Outfit, sans-serif'
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '70%',
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: 'Total Revenue',
+                                    formatter: function (w) {
+                                        return '$' + w.globals.seriesTotals.reduce((a, b) => { return a + b }, 0).toLocaleString()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                colors: ['#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'],
+                dataLabels: {
+                    enabled: false
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            };
+
+            var chart = new ApexCharts(document.querySelector("#revenueChart"), options);
+            chart.render();
+        });
+    </script>
 </body>
 </html>
