@@ -29,6 +29,7 @@ class AdminController
 
             if ($admin && password_verify($password, $admin['password'])) {
                 $_SESSION['admin_id'] = $admin['id'];
+                $_SESSION['admin_role'] = $admin['role'];
                 header('Location: /admin');
                 exit;
             } else {

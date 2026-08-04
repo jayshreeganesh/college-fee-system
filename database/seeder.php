@@ -4,7 +4,6 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use App\Database\DatabaseConnection;
 use App\Models\FeeCategory;
-use App\Models\Student;
 use App\Models\Transaction;
 
 echo "Starting Database Seeder...\n";
@@ -27,7 +26,8 @@ $pdo->exec("
     CREATE TABLE admins (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT NOT NULL,
-        password TEXT NOT NULL
+        password TEXT NOT NULL,
+        role TEXT NOT NULL DEFAULT 'super_admin'
     )
 ");
 
@@ -65,64 +65,52 @@ $pdo->exec("
 
 echo "Tables created successfully.\n";
 
-// 2. Seed Admin
-$adminPassword = password_hash('admin123', PASSWORD_DEFAULT);
-$pdo->exec("INSERT INTO admins (username, password) VALUES ('admin', '{$adminPassword}')");
-echo "Admin seeded (admin / admin123).\n";
+// Load JSON Demo Data
+$jsonData = file_get_contents(__DIR__ . '/demo_data.json');
+$data = json_decode($jsonData, true);
+
+if (!$data) {
+    die("Failed to parse demo_data.json\n");
+}
+
+// 2. Seed Admins
+foreach ($data['admins'] as $admin) {
+    $hashedPassword = password_hash($admin['password'], PASSWORD_DEFAULT);
+    $stmt = $pdo->prepare("INSERT INTO admins (username, password, role) VALUES (?, ?, ?)");
+    $stmt->execute([$admin['username'], $hashedPassword, $admin['role']]);
+}
+echo "Admins seeded from JSON.\n";
 
 // 3. Seed Fee Categories
-$tuition = new FeeCategory();
-$tuition->name = 'Tuition Fee';
-$tuition->description = 'Standard tuition fee for Fall 2026';
-$tuition->save($pdo);
-
-$library = new FeeCategory();
-$library->name = 'Library Fee';
-$library->description = 'Annual library and resources fee';
-$library->save($pdo);
-
-echo "Fee Categories seeded.\n";
+$categoryIds = [];
+foreach ($data['fee_categories'] as $cat) {
+    $feeCat = new FeeCategory();
+    $feeCat->name = $cat['name'];
+    $feeCat->description = $cat['description'];
+    $feeCat->save($pdo);
+    $categoryIds[] = $feeCat->id;
+}
+echo "Fee Categories seeded from JSON.\n";
 
 // 4. Seed Students
-$defaultStudentPassword = password_hash('password123', PASSWORD_DEFAULT);
-
-$student1 = new Student();
-$student1->enrollment_number = 'CS2026-001';
-$student1->name = 'Alice Smith';
-$student1->email = 'alice@example.com';
-$student1->course = 'Computer Science';
-// Quick hack to add password to Student since we didn't add it to the model class yet
-// We will do a raw insert or we can just update the student model first.
-// Actually, let's just insert it manually for the seeder to avoid refactoring the model right now.
-$pdo->exec("INSERT INTO students (enrollment_number, name, email, course, password) VALUES ('CS2026-001', 'Alice Smith', 'alice@example.com', 'Computer Science', '{$defaultStudentPassword}')");
-$student1_id = $pdo->lastInsertId();
-
-$pdo->exec("INSERT INTO students (enrollment_number, name, email, course, password) VALUES ('BA2026-042', 'Bob Johnson', 'bob@example.com', 'Business Administration', '{$defaultStudentPassword}')");
-$student2_id = $pdo->lastInsertId();
-
-echo "Students seeded (CS2026-001 / password123).\n";
+$studentIds = [];
+foreach ($data['students'] as $stu) {
+    $hashedPassword = password_hash($stu['password'], PASSWORD_DEFAULT);
+    $stmt = $pdo->prepare("INSERT INTO students (enrollment_number, name, email, course, password) VALUES (?, ?, ?, ?, ?)");
+    $stmt->execute([$stu['enrollment_number'], $stu['name'], $stu['email'], $stu['course'], $hashedPassword]);
+    $studentIds[] = $pdo->lastInsertId();
+}
+echo "Students seeded from JSON.\n";
 
 // 5. Seed Transactions
-$tx1 = new Transaction();
-$tx1->student_id = $student1_id;
-$tx1->fee_category_id = $tuition->id;
-$tx1->amount = 1500.00;
-$tx1->status = 'paid';
-$tx1->save($pdo);
+foreach ($data['transactions'] as $txData) {
+    $tx = new Transaction();
+    $tx->student_id = $studentIds[$txData['student_index']];
+    $tx->fee_category_id = $categoryIds[$txData['category_index']];
+    $tx->amount = $txData['amount'];
+    $tx->status = $txData['status'];
+    $tx->save($pdo);
+}
+echo "Transactions seeded from JSON.\n";
 
-$tx2 = new Transaction();
-$tx2->student_id = $student1_id;
-$tx2->fee_category_id = $library->id;
-$tx2->amount = 200.00;
-$tx2->status = 'pending';
-$tx2->save($pdo);
-
-$tx3 = new Transaction();
-$tx3->student_id = $student2_id;
-$tx3->fee_category_id = $tuition->id;
-$tx3->amount = 1200.00;
-$tx3->status = 'pending';
-$tx3->save($pdo);
-
-echo "Transactions seeded.\n";
 echo "Database seeding completed successfully!\n";

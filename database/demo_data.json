@@ -1,0 +1,60 @@
+{
+  "admins": [
+    {
+      "username": "admin",
+      "password": "admin123",
+      "role": "super_admin"
+    },
+    {
+      "username": "demo_admin",
+      "password": "password",
+      "role": "recruiter"
+    }
+  ],
+  "fee_categories": [
+    {
+      "name": "Tuition Fee",
+      "description": "Standard tuition fee for Fall 2026"
+    },
+    {
+      "name": "Library Fee",
+      "description": "Annual library and resources fee"
+    }
+  ],
+  "students": [
+    {
+      "enrollment_number": "CS2026-001",
+      "name": "Alice Smith",
+      "email": "alice@example.com",
+      "course": "Computer Science",
+      "password": "password123"
+    },
+    {
+      "enrollment_number": "BA2026-042",
+      "name": "Bob Johnson",
+      "email": "bob@example.com",
+      "course": "Business Administration",
+      "password": "password123"
+    }
+  ],
+  "transactions": [
+    {
+      "student_index": 0,
+      "category_index": 0,
+      "amount": 1500.00,
+      "status": "paid"
+    },
+    {
+      "student_index": 0,
+      "category_index": 1,
+      "amount": 200.00,
+      "status": "pending"
+    },
+    {
+      "student_index": 1,
+      "category_index": 0,
+      "amount": 1200.00,
+      "status": "pending"
+    }
+  ]
+}
