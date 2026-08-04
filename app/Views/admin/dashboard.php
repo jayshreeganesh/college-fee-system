@@ -26,6 +26,7 @@
                 <p class="text-slate-500 mt-1">Real-time statistics for the College Fee System</p>
             </div>
             <div class="flex gap-4">
+                <?php if (($_SESSION['admin_role'] ?? '') === 'super_admin'): ?>
                 <a href="/admin/student/add" class="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition-all transform hover:-translate-y-1">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
                     Add Student
@@ -34,6 +35,7 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                     Add Payment
                 </a>
+                <?php endif; ?>
                 <a href="/admin/reports" class="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md transition-all transform hover:-translate-y-1">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     Reports
@@ -114,7 +116,7 @@
                 </div>
                 
                 <!-- Restore -->
-                <div class="bg-rose-50 border border-rose-100 p-6 rounded-2xl flex flex-col items-center text-center">
+                <div class="bg-rose-50 border border-rose-100 p-6 rounded-2xl flex flex-col items-center text-center <?php echo (($_SESSION['admin_role'] ?? '') !== 'super_admin') ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''; ?>">
                     <h4 class="text-lg font-bold text-rose-800 mb-2">Restore Database</h4>
                     <p class="text-sm text-rose-600 mb-4 flex-1">Upload a previous .sqlite backup to overwrite the live database.</p>
                     <form action="/admin/restore" method="POST" enctype="multipart/form-data" class="w-full flex flex-col gap-2">
@@ -122,6 +124,9 @@
                         <input type="file" name="database_file" accept=".sqlite" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-rose-100 file:text-rose-700 hover:file:bg-rose-200" required>
                         <button type="submit" class="w-full py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg shadow-sm transition-colors">Upload & Restore</button>
                     </form>
+                    <?php if (($_SESSION['admin_role'] ?? '') !== 'super_admin'): ?>
+                        <p class="text-xs text-rose-800 mt-2 font-bold">Super Admin Only</p>
+                    <?php endif; ?>
                 </div>
                 
                 <!-- Export Source Code -->

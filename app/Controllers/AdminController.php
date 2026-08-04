@@ -175,6 +175,10 @@ class AdminController
             exit;
         }
 
+        if (($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied: You do not have permission to perform this action.');
+        }
+
         $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
         $pdo = $db->getPdo();
 
@@ -190,6 +194,10 @@ class AdminController
         if (!isset($_SESSION['admin_id'])) {
             header('Location: /login');
             exit;
+        }
+
+        if (($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied: You do not have permission to perform this action.');
         }
 
         $student_id = $_POST['student_id'] ?? null;
@@ -232,6 +240,10 @@ class AdminController
             exit;
         }
 
+        if (($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied: You do not have permission to perform this action.');
+        }
+
         $pageTitle = "Add Student - College Fee System";
         require_once BASE_PATH . '/app/Views/admin/add_student.php';
     }
@@ -241,6 +253,10 @@ class AdminController
         if (!isset($_SESSION['admin_id'])) {
             header('Location: /login');
             exit;
+        }
+
+        if (($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied: You do not have permission to perform this action.');
         }
 
         if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
@@ -294,6 +310,10 @@ class AdminController
         if (!isset($_SESSION['admin_id'])) {
             header('Location: /login');
             exit;
+        }
+
+        if (($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied: You do not have permission to perform this action.');
         }
 
         if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
