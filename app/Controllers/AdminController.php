@@ -432,4 +432,71 @@ class AdminController
         header('Location: /admin');
         exit;
     }
+
+    public function listUsers()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        if (($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied: You do not have permission to view this page.');
+        }
+
+        $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+        $pdo = $db->getPdo();
+        $admins = $pdo->query('SELECT id, username, role FROM admins ORDER BY id ASC')->fetchAll(PDO::FETCH_ASSOC);
+
+        $pageTitle = "Manage Users - College Fee System";
+        require_once BASE_PATH . '/app/Views/admin/users.php';
+    }
+
+    public function addUser()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        if (($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied: You do not have permission to perform this action.');
+        }
+
+        $pageTitle = "Add User - College Fee System";
+        require_once BASE_PATH . '/app/Views/admin/add_user.php';
+    }
+
+    public function storeUser()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        if (($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied: You do not have permission to perform this action.');
+        }
+
+        if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+            die('CSRF token validation failed.');
+        }
+
+        $username = trim($_POST['username'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $role = $_POST['role'] ?? 'recruiter';
+
+        if (empty($username) || empty($password)) {
+            die('Username and Password are required.');
+        }
+
+        $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+        $pdo = $db->getPdo();
+
+        $stmt = $pdo->prepare('INSERT INTO admins (username, password, role) VALUES (?, ?, ?)');
+        $stmt->execute([$username, password_hash($password, PASSWORD_DEFAULT), $role]);
+
+        header('Location: /admin/users');
+        exit;
+    }
 }

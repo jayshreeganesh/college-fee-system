@@ -18,7 +18,31 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 // Strip the base directory if running in a subfolder like XAMPP
 // Since we will run this via 'php -S localhost:8000', $uri is just '/'
-if ($uri === '/' || $uri === '/index.php') {
+
+// --- Setup Lock Facility ---
+$lockFile = dirname(__DIR__) . '/setup.lock';
+
+if (!file_exists($lockFile)) {
+    // If lock doesn't exist, ONLY allow the setup route
+    if ($uri !== '/setup') {
+        header('Location: /setup');
+        exit;
+    }
+} else {
+    // If lock DOES exist, completely block the setup route
+    if ($uri === '/setup') {
+        die('System is already securely installed. Remove setup.lock to reinstall.');
+    }
+}
+
+if ($uri === '/setup') {
+    $controller = new \App\Controllers\SetupController();
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $controller->install();
+    } else {
+        $controller->index();
+    }
+} elseif ($uri === '/' || $uri === '/index.php') {
     $controller = new \App\Controllers\HomeController();
     $controller->index();
 } elseif ($uri === '/login') {
@@ -48,6 +72,16 @@ if ($uri === '/' || $uri === '/index.php') {
 } elseif ($uri === '/admin/export-project') {
     $controller = new \App\Controllers\AdminController();
     $controller->exportProject();
+} elseif ($uri === '/admin/users') {
+    $controller = new \App\Controllers\AdminController();
+    $controller->listUsers();
+} elseif ($uri === '/admin/users/add') {
+    $controller = new \App\Controllers\AdminController();
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $controller->storeUser();
+    } else {
+        $controller->addUser();
+    }
 } elseif ($uri === '/admin/payment') {
     $controller = new \App\Controllers\AdminController();
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
