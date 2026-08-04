@@ -62,6 +62,13 @@ if ($uri === '/' || $uri === '/index.php') {
     } else {
         $controller->addStudent();
     }
+} elseif ($uri === '/admin/student/import') {
+    $controller = new \App\Controllers\AdminController();
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $controller->processImportStudents();
+    } else {
+        $controller->importStudents();
+    }
 } elseif ($uri === '/student/login') {
     $controller = new \App\Controllers\StudentController();
     $controller->login();

@@ -305,6 +305,68 @@ class AdminController
         exit;
     }
 
+    public function importStudents()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        if (($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied: You do not have permission to perform this action.');
+        }
+
+        $pageTitle = "Import Students - College Fee System";
+        require_once BASE_PATH . '/app/Views/admin/import_students.php';
+    }
+
+    public function processImportStudents()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        if (($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied: You do not have permission to perform this action.');
+        }
+
+        if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+            die('CSRF token validation failed.');
+        }
+
+        if (isset($_FILES['csv_file']) && $_FILES['csv_file']['error'] === UPLOAD_ERR_OK) {
+            $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+            $pdo = $db->getPdo();
+
+            $file = fopen($_FILES['csv_file']['tmp_name'], 'r');
+
+            // Skip the header row
+            fgetcsv($file);
+
+            $stmt = $pdo->prepare('INSERT INTO students (enrollment_number, name, email, course, password) VALUES (?, ?, ?, ?, ?)');
+
+            $pdo->beginTransaction();
+            while (($data = fgetcsv($file)) !== false) {
+                // Expected CSV Format: Enrollment Number, Name, Email, Course, Default Password
+                if (count($data) >= 5) {
+                    $enrollment = trim($data[0]);
+                    $name = trim($data[1]);
+                    $email = trim($data[2]);
+                    $course = trim($data[3]);
+                    $password = password_hash(trim($data[4]), PASSWORD_DEFAULT);
+
+                    $stmt->execute([$enrollment, $name, $email, $course, $password]);
+                }
+            }
+            $pdo->commit();
+            fclose($file);
+        }
+
+        header('Location: /admin');
+        exit;
+    }
+
     public function restoreDatabase()
     {
         if (!isset($_SESSION['admin_id'])) {
