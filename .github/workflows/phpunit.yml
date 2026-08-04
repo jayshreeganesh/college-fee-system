@@ -2,9 +2,17 @@ name: PHPUnit CI
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "master", "main" ]
+    paths:
+      - '**.php'
+      - 'composer.json'
+      - 'phpunit.xml'
   pull_request:
-    branches: [ "main", "master" ]
+    branches: [ "master", "main" ]
+    paths:
+      - '**.php'
+      - 'composer.json'
+      - 'phpunit.xml'
 
 jobs:
   test:
