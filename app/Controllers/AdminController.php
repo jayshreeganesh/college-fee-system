@@ -269,4 +269,85 @@ class AdminController
         header('Location: /admin');
         exit;
     }
+
+    public function backupDatabase()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        $dbPath = dirname(__DIR__, 2) . '/database/app.sqlite';
+        if (file_exists($dbPath)) {
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="database_backup_' . date('Y-m-d_His') . '.sqlite"');
+            header('Content-Length: ' . filesize($dbPath));
+            readfile($dbPath);
+            exit;
+        }
+        header('Location: /admin');
+        exit;
+    }
+
+    public function restoreDatabase()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+            die('CSRF token validation failed.');
+        }
+
+        if (isset($_FILES['database_file']) && $_FILES['database_file']['error'] === UPLOAD_ERR_OK) {
+            $dbPath = dirname(__DIR__, 2) . '/database/app.sqlite';
+            move_uploaded_file($_FILES['database_file']['tmp_name'], $dbPath);
+        }
+
+        header('Location: /admin');
+        exit;
+    }
+
+    public function exportProject()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        $projectPath = dirname(__DIR__, 2);
+        $zipFile = $projectPath . '/project_source_export.zip';
+
+        $zip = new \ZipArchive();
+        if ($zip->open($zipFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
+            $directory = new \RecursiveDirectoryIterator($projectPath, \RecursiveDirectoryIterator::SKIP_DOTS);
+            $filter = new \RecursiveCallbackFilterIterator($directory, function ($current, $key, $iterator) {
+                $exclude = ['.git', 'node_modules', 'vendor', 'project_source_export.zip', 'screenshots'];
+                if ($current->isDir() && in_array($current->getFilename(), $exclude, true)) {
+                    return false;
+                }
+                return true;
+            });
+            $files = new \RecursiveIteratorIterator($filter, \RecursiveIteratorIterator::LEAVES_ONLY);
+
+            foreach ($files as $name => $file) {
+                if (!$file->isDir()) {
+                    $filePath = $file->getRealPath();
+                    $relativePath = substr($filePath, strlen($projectPath) + 1);
+                    $zip->addFile($filePath, $relativePath);
+                }
+            }
+            $zip->close();
+
+            header('Content-Type: application/zip');
+            header('Content-Disposition: attachment; filename="college-fee-system-source.zip"');
+            header('Content-Length: ' . filesize($zipFile));
+            readfile($zipFile);
+            unlink($zipFile);
+            exit;
+        }
+        header('Location: /admin');
+        exit;
+    }
 }

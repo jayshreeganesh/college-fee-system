@@ -101,6 +101,37 @@
                 <div class="px-8 py-12 text-center text-slate-500">No transactions found.</div>
             <?php endif; ?>
         </div>
+        
+        <!-- System Operations -->
+        <div class="mt-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+            <h3 class="text-xl font-bold text-slate-800 mb-4">System Operations</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Backup -->
+                <div class="bg-indigo-50 border border-indigo-100 p-6 rounded-2xl flex flex-col items-center text-center">
+                    <h4 class="text-lg font-bold text-indigo-800 mb-2">Backup Database</h4>
+                    <p class="text-sm text-indigo-600 mb-4 flex-1">Download a secure copy of the app.sqlite database file.</p>
+                    <a href="/admin/backup" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-sm transition-colors">Download Backup</a>
+                </div>
+                
+                <!-- Restore -->
+                <div class="bg-rose-50 border border-rose-100 p-6 rounded-2xl flex flex-col items-center text-center">
+                    <h4 class="text-lg font-bold text-rose-800 mb-2">Restore Database</h4>
+                    <p class="text-sm text-rose-600 mb-4 flex-1">Upload a previous .sqlite backup to overwrite the live database.</p>
+                    <form action="/admin/restore" method="POST" enctype="multipart/form-data" class="w-full flex flex-col gap-2">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                        <input type="file" name="database_file" accept=".sqlite" class="text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-rose-100 file:text-rose-700 hover:file:bg-rose-200" required>
+                        <button type="submit" class="w-full py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg shadow-sm transition-colors">Upload & Restore</button>
+                    </form>
+                </div>
+                
+                <!-- Export Source Code -->
+                <div class="bg-emerald-50 border border-emerald-100 p-6 rounded-2xl flex flex-col items-center text-center">
+                    <h4 class="text-lg font-bold text-emerald-800 mb-2">Export Project</h4>
+                    <p class="text-sm text-emerald-600 mb-4 flex-1">Download the entire PHP source code as a ZIP archive.</p>
+                    <a href="/admin/export-project" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-sm transition-colors">Export Source Code</a>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script>

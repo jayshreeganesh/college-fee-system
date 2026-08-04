@@ -37,6 +37,17 @@ if ($uri === '/' || $uri === '/index.php') {
 } elseif ($uri === '/admin/reports') {
     $controller = new \App\Controllers\AdminController();
     $controller->reports();
+} elseif ($uri === '/admin/backup') {
+    $controller = new \App\Controllers\AdminController();
+    $controller->backupDatabase();
+} elseif ($uri === '/admin/restore') {
+    $controller = new \App\Controllers\AdminController();
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $controller->restoreDatabase();
+    }
+} elseif ($uri === '/admin/export-project') {
+    $controller = new \App\Controllers\AdminController();
+    $controller->exportProject();
 } elseif ($uri === '/admin/payment') {
     $controller = new \App\Controllers\AdminController();
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
