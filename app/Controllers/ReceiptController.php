@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Core\DatabaseConnection;
+use App\Database\DatabaseConnection;
 use PDO;
 
 class ReceiptController
