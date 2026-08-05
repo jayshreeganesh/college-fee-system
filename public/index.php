@@ -48,6 +48,13 @@ if ($uri === '/setup') {
 } elseif ($uri === '/login') {
     $controller = new \App\Controllers\AdminController();
     $controller->login();
+} elseif ($uri === '/forgot-password') {
+    $controller = new \App\Controllers\AuthController();
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $controller->sendResetLink();
+    } else {
+        $controller->forgotPassword();
+    }
 } elseif ($uri === '/logout') {
     session_destroy();
     header('Location: /');
@@ -82,6 +89,9 @@ if ($uri === '/setup') {
     } else {
         $controller->addUser();
     }
+} elseif ($uri === '/receipt') {
+    $controller = new \App\Controllers\ReceiptController();
+    $controller->show();
 } elseif ($uri === '/admin/payment') {
     $controller = new \App\Controllers\AdminController();
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {

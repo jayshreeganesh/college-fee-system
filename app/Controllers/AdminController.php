@@ -56,7 +56,7 @@ class AdminController
         $totalPending = $pdo->query("SELECT SUM(amount) FROM transactions WHERE status = 'pending'")->fetchColumn() ?: 0;
 
         $recentTransactions = $pdo->query('
-            SELECT t.amount, t.status, t.created_at, s.name as student_name, f.name as fee_name 
+            SELECT t.id, t.amount, t.status, t.created_at, s.name as student_name, f.name as fee_name 
             FROM transactions t 
             JOIN students s ON t.student_id = s.id 
             JOIN fee_categories f ON t.fee_category_id = f.id 
@@ -94,7 +94,7 @@ class AdminController
         $courseFilter = $_GET['course'] ?? '';
 
         $query = '
-            SELECT t.amount, t.status, t.created_at, s.name as student_name, s.course, f.name as fee_name 
+            SELECT t.id, t.amount, t.status, t.created_at, s.name as student_name, s.course, f.name as fee_name 
             FROM transactions t 
             JOIN students s ON t.student_id = s.id 
             JOIN fee_categories f ON t.fee_category_id = f.id 

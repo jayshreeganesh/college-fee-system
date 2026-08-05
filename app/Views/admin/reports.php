@@ -65,6 +65,7 @@
                             <th class="p-4 font-semibold">Fee Type</th>
                             <th class="p-4 font-semibold">Amount</th>
                             <th class="p-4 font-semibold">Status</th>
+                            <th class="p-4 font-semibold">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -80,6 +81,11 @@
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800">Paid</span>
                                 <?php else: ?>
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800">Pending</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="p-4">
+                                <?php if ($tx['status'] === 'paid'): ?>
+                                    <a href="/receipt?id=<?php echo $tx['id']; ?>" class="text-indigo-600 hover:text-indigo-800 font-bold text-xs" target="_blank">Receipt</a>
                                 <?php endif; ?>
                             </td>
                         </tr>

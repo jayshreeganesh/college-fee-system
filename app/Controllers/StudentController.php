@@ -41,7 +41,6 @@ class StudentController
 
     public function portal()
     {
-        // Protect the portal
         if (!isset($_SESSION['student_id'])) {
             header('Location: /student/login');
             exit;
@@ -50,26 +49,35 @@ class StudentController
         $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
         $pdo = $db->getPdo();
 
-        // Fetch actual student data
-        $stmt = $pdo->prepare('SELECT * FROM students WHERE id = :id');
-        $stmt->execute(['id' => $_SESSION['student_id']]);
+        $studentId = $_SESSION['student_id'];
+
+        // Get student details
+        $stmt = $pdo->prepare('SELECT * FROM students WHERE id = ?');
+        $stmt->execute([$studentId]);
         $studentData = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Fetch transactions
-        $stmt = $pdo->prepare('SELECT * FROM transactions WHERE student_id = :student_id ORDER BY created_at DESC');
-        $stmt->execute(['student_id' => $_SESSION['student_id']]);
-        $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Save enrollment to session for receipt verification if not already there
+        $_SESSION['student_enrollment'] = $studentData['enrollment_number'];
 
-        $totalPaid = 0;
-        $pendingDues = 0;
-        foreach ($transactions as $tx) {
-            if ($tx['status'] === 'paid') {
-                $totalPaid += $tx['amount'];
-            } else {
-                $pendingDues += $tx['amount'];
-            }
-        }
-        $lastTransaction = count($transactions) > 0 ? '$' . number_format($transactions[0]['amount'], 2) . ' (' . $transactions[0]['status'] . ')' : 'None';
+        // Get totals
+        $stmtTotal = $pdo->prepare("SELECT SUM(amount) FROM transactions WHERE student_id = ? AND status = 'paid'");
+        $stmtTotal->execute([$studentId]);
+        $totalPaid = $stmtTotal->fetchColumn() ?: 0;
+
+        $stmtPending = $pdo->prepare("SELECT SUM(amount) FROM transactions WHERE student_id = ? AND status = 'pending'");
+        $stmtPending->execute([$studentId]);
+        $totalPending = $stmtPending->fetchColumn() ?: 0;
+
+        // Get recent transactions
+        $stmtTx = $pdo->prepare('
+            SELECT t.id, t.amount, t.status, t.created_at, f.name as fee_name 
+            FROM transactions t 
+            JOIN fee_categories f ON t.fee_category_id = f.id 
+            WHERE t.student_id = ? 
+            ORDER BY t.created_at DESC
+        ');
+        $stmtTx->execute([$studentId]);
+        $transactions = $stmtTx->fetchAll(PDO::FETCH_ASSOC);
 
         $pageTitle = "Student Portal - College Fee System";
         require_once BASE_PATH . '/app/Views/student/portal.php';

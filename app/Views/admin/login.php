@@ -34,6 +34,9 @@
             <button type="submit" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition-all duration-200">
                 Sign In
             </button>
+            <div class="text-center mt-4">
+                <a href="/forgot-password" class="text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">Forgot your password?</a>
+            </div>
         </form>
         <div class="mt-8 text-center">
             <a href="/" class="text-indigo-600 font-semibold hover:underline">&larr; Back to Home</a>

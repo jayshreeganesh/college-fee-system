@@ -87,6 +87,7 @@
                         <th class="px-8 py-4 text-sm font-bold text-slate-400 uppercase tracking-wider bg-white">Amount</th>
                         <th class="px-8 py-4 text-sm font-bold text-slate-400 uppercase tracking-wider bg-white">Status</th>
                         <th class="px-8 py-4 text-sm font-bold text-slate-400 uppercase tracking-wider bg-white">Date</th>
+                        <th class="px-8 py-4 text-sm font-bold text-slate-400 uppercase tracking-wider bg-white">Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -103,6 +104,11 @@
                             <?php endif; ?>
                         </td>
                         <td class="px-8 py-4 text-slate-400 text-sm"><?php echo htmlspecialchars(date('M j, Y', strtotime($tx['created_at']))); ?></td>
+                        <td class="px-8 py-4">
+                            <?php if ($tx['status'] === 'paid'): ?>
+                                <a href="/receipt?id=<?php echo $tx['id']; ?>" class="text-indigo-600 hover:text-indigo-800 font-bold text-xs" target="_blank">Print Receipt</a>
+                            <?php endif; ?>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>

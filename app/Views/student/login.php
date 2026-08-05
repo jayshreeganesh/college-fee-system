@@ -31,9 +31,13 @@
                 <label class="block text-sm font-semibold text-slate-700 mb-2">Password</label>
                 <input type="password" name="password" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all" placeholder="••••••••" required>
             </div>
-            <button type="submit" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg transition-all duration-200">
-                Log In
+            <button type="submit" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg transition-all transform hover:-translate-y-1">
+                Access Portal
             </button>
+            
+            <div class="text-center mt-4">
+                <a href="/forgot-password" class="text-sm font-bold text-slate-500 hover:text-emerald-600 transition-colors">Forgot your password?</a>
+            </div>
         </form>
         <div class="mt-8 text-center">
             <a href="/" class="text-indigo-600 font-semibold hover:underline">&larr; Back to Home</a>
