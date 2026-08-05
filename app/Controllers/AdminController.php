@@ -227,6 +227,7 @@ class AdminController
             $tx->status = $status;
 
             $tx->save($pdo);
+            $this->logAction($pdo, "Added payment of \${$amount} for student ID {$student_id}");
         }
 
         header('Location: /admin');
@@ -498,5 +499,141 @@ class AdminController
 
         header('Location: /admin/users');
         exit;
+    }
+
+    public function settings()
+    {
+        if (!isset($_SESSION['admin_id']) || ($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied');
+        }
+
+        $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+        $pdo = $db->getPdo();
+
+        $settingsQuery = $pdo->query('SELECT key, value FROM settings')->fetchAll(PDO::FETCH_KEY_PAIR);
+        $settings = array_merge([
+            'college_name' => 'TECH UNIVERSITY',
+            'college_address' => '123 Innovation Drive, Tech City, TX 75001',
+            'college_contact' => 'contact@techuniversity.edu | (555) 123-4567',
+        ], $settingsQuery ?: []);
+
+        $pageTitle = "System Settings - College Fee System";
+        require_once BASE_PATH . '/app/Views/admin/settings.php';
+    }
+
+    public function updateSettings()
+    {
+        if (!isset($_SESSION['admin_id']) || ($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied');
+        }
+
+        if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+            die('CSRF token validation failed.');
+        }
+
+        $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+        $pdo = $db->getPdo();
+
+        $stmt = $pdo->prepare('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value');
+
+        $fields = ['college_name', 'college_address', 'college_contact'];
+        foreach ($fields as $field) {
+            if (isset($_POST[$field])) {
+                $stmt->execute([$field, trim($_POST[$field])]);
+            }
+        }
+
+        header('Location: /admin/settings?success=1');
+        exit;
+    }
+
+    public function listFees()
+    {
+        if (!isset($_SESSION['admin_id']) || ($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied');
+        }
+
+        $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+        $pdo = $db->getPdo();
+        $fees = $pdo->query('SELECT * FROM fee_categories ORDER BY id ASC')->fetchAll(PDO::FETCH_ASSOC);
+
+        $pageTitle = "Manage Fee Categories - College Fee System";
+        require_once BASE_PATH . '/app/Views/admin/fees.php';
+    }
+
+    public function storeFee()
+    {
+        if (!isset($_SESSION['admin_id']) || ($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied');
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+                die('CSRF token validation failed.');
+            }
+
+            $name = trim($_POST['name'] ?? '');
+            $amount = floatval($_POST['amount'] ?? 0);
+
+            if ($name && $amount > 0) {
+                $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+                $pdo = $db->getPdo();
+                $stmt = $pdo->prepare('INSERT INTO fee_categories (name, amount) VALUES (?, ?)');
+                $stmt->execute([$name, $amount]);
+            }
+        }
+        header('Location: /admin/fees');
+        exit;
+    }
+
+    public function deleteFee()
+    {
+        if (!isset($_SESSION['admin_id']) || ($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied');
+        }
+
+        $id = $_GET['id'] ?? null;
+        if ($id) {
+            $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+            $pdo = $db->getPdo();
+
+            // Check if fee is used in transactions
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM transactions WHERE fee_category_id = ?');
+            $stmt->execute([$id]);
+            if ($stmt->fetchColumn() == 0) {
+                $del = $pdo->prepare('DELETE FROM fee_categories WHERE id = ?');
+                $del->execute([$id]);
+            } else {
+                die('Cannot delete fee category because it is already associated with student transactions.');
+            }
+        }
+        header('Location: /admin/fees');
+        exit;
+    }
+
+    private function logAction($pdo, $action)
+    {
+        if (isset($_SESSION['admin_id'])) {
+            $stmt = $pdo->prepare('SELECT username FROM admins WHERE id = ?');
+            $stmt->execute([$_SESSION['admin_id']]);
+            $username = $stmt->fetchColumn() ?: 'Unknown';
+
+            $log = $pdo->prepare('INSERT INTO audit_logs (admin_username, action) VALUES (?, ?)');
+            $log->execute([$username, $action]);
+        }
+    }
+
+    public function auditLogs()
+    {
+        if (!isset($_SESSION['admin_id']) || ($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied: Only Super Admins can view audit logs.');
+        }
+
+        $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+        $pdo = $db->getPdo();
+        $logs = $pdo->query('SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 100')->fetchAll(PDO::FETCH_ASSOC);
+
+        $pageTitle = "Security Audit Logs - College Fee System";
+        require_once BASE_PATH . '/app/Views/admin/audit_logs.php';
     }
 }

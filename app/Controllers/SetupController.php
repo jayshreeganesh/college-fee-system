@@ -64,6 +64,18 @@ class SetupController
                     FOREIGN KEY (student_id) REFERENCES students(id),
                     FOREIGN KEY (fee_category_id) REFERENCES fee_categories(id)
                 );
+                
+                CREATE TABLE IF NOT EXISTS settings (
+                    key TEXT PRIMARY KEY,
+                    value TEXT
+                );
+                
+                CREATE TABLE IF NOT EXISTS audit_logs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    admin_username TEXT NOT NULL,
+                    action TEXT NOT NULL,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                );
             ");
 
             // 2. Insert Super Admin
@@ -75,7 +87,11 @@ class SetupController
                 INSERT OR IGNORE INTO fee_categories (name, amount) VALUES 
                 ('Tuition Fee', 1500.00),
                 ('Library Fee', 100.00),
-                ('Hostel Fee', 800.00)
+                ('Hostel Fee', 800.00);
+                
+                INSERT OR IGNORE INTO settings (key, value) VALUES ('college_name', 'TECH UNIVERSITY');
+                INSERT OR IGNORE INTO settings (key, value) VALUES ('college_address', '123 Innovation Drive, Tech City, TX 75001');
+                INSERT OR IGNORE INTO settings (key, value) VALUES ('college_contact', 'contact@techuniversity.edu | (555) 123-4567');
             ");
 
             // 4. Create Lock File

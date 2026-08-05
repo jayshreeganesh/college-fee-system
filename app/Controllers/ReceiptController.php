@@ -55,6 +55,13 @@ class ReceiptController
             }
         }
 
+        $settingsQuery = $pdo->query('SELECT key, value FROM settings')->fetchAll(PDO::FETCH_KEY_PAIR);
+        $settings = array_merge([
+            'college_name' => 'TECH UNIVERSITY',
+            'college_address' => '123 Innovation Drive, Tech City, TX 75001',
+            'college_contact' => 'contact@techuniversity.edu | (555) 123-4567',
+        ], $settingsQuery ?: []);
+
         $pageTitle = "Receipt #" . str_pad($receipt['id'], 6, '0', STR_PAD_LEFT);
         require_once BASE_PATH . '/app/Views/receipt.php';
     }

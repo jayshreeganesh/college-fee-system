@@ -33,9 +33,9 @@
             
             <div class="flex justify-between items-start border-b-2 border-slate-100 pb-8 mb-8">
                 <div>
-                    <h1 class="text-3xl font-extrabold text-indigo-700 tracking-tight">TECH UNIVERSITY</h1>
-                    <p class="text-sm text-slate-500 mt-1">123 Innovation Drive, Tech City, TX 75001</p>
-                    <p class="text-sm text-slate-500">contact@techuniversity.edu | (555) 123-4567</p>
+                    <h1 class="text-3xl font-extrabold text-indigo-700 tracking-tight"><?php echo htmlspecialchars(mb_strtoupper($settings['college_name'])); ?></h1>
+                    <p class="text-sm text-slate-500 mt-1"><?php echo htmlspecialchars($settings['college_address']); ?></p>
+                    <p class="text-sm text-slate-500"><?php echo htmlspecialchars($settings['college_contact']); ?></p>
                 </div>
                 <div class="text-right">
                     <h2 class="text-xl font-bold text-slate-800">OFFICIAL RECEIPT</h2>

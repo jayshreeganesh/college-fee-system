@@ -51,16 +51,33 @@ $pdo->exec("
 ");
 
 $pdo->exec("
-    CREATE TABLE transactions (
+    CREATE TABLE IF NOT EXISTS transactions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         student_id INTEGER NOT NULL,
         fee_category_id INTEGER NOT NULL,
-        amount DECIMAL(10, 2) NOT NULL,
-        status TEXT NOT NULL DEFAULT 'pending',
+        amount REAL NOT NULL,
+        status TEXT NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(student_id) REFERENCES students(id),
-        FOREIGN KEY(fee_category_id) REFERENCES fee_categories(id)
-    )
+        FOREIGN KEY (student_id) REFERENCES students(id),
+        FOREIGN KEY (fee_category_id) REFERENCES fee_categories(id)
+    );
+    CREATE TABLE IF NOT EXISTS settings (
+        key TEXT PRIMARY KEY,
+        value TEXT
+    );
+    CREATE TABLE IF NOT EXISTS audit_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        admin_username TEXT NOT NULL,
+        action TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+");
+
+// 2. Insert Settings
+$pdo->exec("
+    INSERT OR IGNORE INTO settings (key, value) VALUES ('college_name', 'TECH UNIVERSITY');
+    INSERT OR IGNORE INTO settings (key, value) VALUES ('college_address', '123 Innovation Drive, Tech City, TX 75001');
+    INSERT OR IGNORE INTO settings (key, value) VALUES ('college_contact', 'contact@techuniversity.edu | (555) 123-4567');
 ");
 
 echo "Tables created successfully.\n";

@@ -79,6 +79,25 @@ if ($uri === '/setup') {
 } elseif ($uri === '/admin/export-project') {
     $controller = new \App\Controllers\AdminController();
     $controller->exportProject();
+} elseif ($uri === '/admin/settings') {
+    $controller = new \App\Controllers\AdminController();
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $controller->updateSettings();
+    } else {
+        $controller->settings();
+    }
+} elseif ($uri === '/admin/fees') {
+    $controller = new \App\Controllers\AdminController();
+    $controller->listFees();
+} elseif ($uri === '/admin/fees/add') {
+    $controller = new \App\Controllers\AdminController();
+    $controller->storeFee();
+} elseif ($uri === '/admin/fees/delete') {
+    $controller = new \App\Controllers\AdminController();
+    $controller->deleteFee();
+} elseif ($uri === '/admin/audit-logs') {
+    $controller = new \App\Controllers\AdminController();
+    $controller->auditLogs();
 } elseif ($uri === '/admin/users') {
     $controller = new \App\Controllers\AdminController();
     $controller->listUsers();
