@@ -106,9 +106,10 @@
 
             <!-- Database Operations -->
             <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 p-4 rounded-3xl flex flex-col items-center text-center">
-                <h4 class="text-sm font-bold text-indigo-800 dark:text-indigo-300 mb-2">Database Backup</h4>
+                <h4 class="text-sm font-bold text-indigo-800 dark:text-indigo-300 mb-2">System Operations</h4>
                 <a href="/admin/backup" class="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors mb-2">Download SQLite DB</a>
-                <a href="/admin/seed-demo-data" onclick="return confirm('This will instantly generate 15 demo students and transactions. Proceed?')" class="w-full py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 dark:bg-indigo-800 dark:text-indigo-200 dark:hover:bg-indigo-700 text-sm font-bold rounded-lg transition-colors">Seed Demo Data</a>
+                <a href="/admin/seed-demo-data" onclick="return confirm('This will instantly generate 15 demo students and transactions. Proceed?')" class="w-full py-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 dark:bg-indigo-800 dark:text-indigo-200 dark:hover:bg-indigo-700 text-sm font-bold rounded-lg transition-colors mb-2">Seed Demo Data</a>
+                <a href="/admin/export-project" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg shadow-sm transition-colors">Export Project ZIP</a>
             </div>
             
             <div class="bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800 p-4 rounded-3xl flex flex-col items-center text-center <?php echo (($_SESSION['admin_role'] ?? '') !== 'super_admin') ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''; ?>">
