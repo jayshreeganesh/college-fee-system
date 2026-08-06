@@ -101,6 +101,12 @@ if ($uri === '/setup') {
 } elseif ($uri === '/admin/emails') {
     $controller = new \App\Controllers\AdminController();
     $controller->emailLogs();
+} elseif ($uri === '/admin/student/import/template') {
+    $controller = new \App\Controllers\AdminController();
+    $controller->downloadImportTemplate();
+} elseif ($uri === '/admin/seed-demo-data') {
+    $controller = new \App\Controllers\AdminController();
+    $controller->seedDemoData();
 } elseif ($uri === '/admin/users') {
     $controller = new \App\Controllers\AdminController();
     $controller->listUsers();

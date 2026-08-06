@@ -20,9 +20,15 @@
     
     <div class="max-w-3xl mx-auto p-8 mt-4">
         <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
-            <div class="px-8 py-6 border-b border-slate-100 bg-slate-50/50">
-                <h2 class="text-2xl font-bold text-slate-800">Bulk Import Students</h2>
-                <p class="text-slate-500 mt-1">Upload a CSV/Excel file to quickly register hundreds of students</p>
+            <div class="px-8 py-6 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">Bulk Import Students</h2>
+                    <p class="text-slate-500 mt-1">Upload a CSV/Excel file to quickly register hundreds of students</p>
+                </div>
+                <a href="/admin/student/import/template" class="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Download Template
+                </a>
             </div>
             
             <div class="p-8">

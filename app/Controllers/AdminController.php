@@ -415,13 +415,13 @@ class AdminController
         }
 
         $projectPath = dirname(__DIR__, 2);
-        $zipFile = $projectPath . '/project_source_export.zip';
+        $zipFile = $projectPath . '/college-fee-system.zip';
 
         $zip = new \ZipArchive();
         if ($zip->open($zipFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
             $directory = new \RecursiveDirectoryIterator($projectPath, \RecursiveDirectoryIterator::SKIP_DOTS);
             $filter = new \RecursiveCallbackFilterIterator($directory, function ($current, $key, $iterator) {
-                $exclude = ['.git', 'node_modules', 'vendor', 'project_source_export.zip', 'screenshots'];
+                $exclude = ['.git', 'node_modules', 'vendor', 'college-fee-system.zip', 'project_source_export.zip', 'screenshots'];
                 if ($current->isDir() && in_array($current->getFilename(), $exclude, true)) {
                     return false;
                 }
@@ -439,14 +439,14 @@ class AdminController
             $zip->close();
 
             header('Content-Type: application/zip');
-            header('Content-Disposition: attachment; filename="college-fee-system-source.zip"');
+            header('Content-disposition: attachment; filename=college-fee-system.zip');
             header('Content-Length: ' . filesize($zipFile));
             readfile($zipFile);
             unlink($zipFile);
             exit;
+        } else {
+            die('Failed to create zip file.');
         }
-        header('Location: /admin');
-        exit;
     }
 
     public function listUsers()
@@ -590,6 +590,75 @@ class AdminController
 
         $pageTitle = "System Settings - College Fee System";
         require_once BASE_PATH . '/app/Views/admin/settings.php';
+    }
+
+    public function downloadImportTemplate()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="student_import_template.csv"');
+        
+        $output = fopen('php://output', 'w');
+        fputcsv($output, ['name', 'email', 'phone', 'password', 'roll_number']);
+        fputcsv($output, ['John Doe', 'john@example.com', '1234567890', 'password123', 'CS101']);
+        fputcsv($output, ['Jane Smith', 'jane@example.com', '0987654321', 'password123', 'CS102']);
+        fclose($output);
+        exit;
+    }
+
+    public function seedDemoData()
+    {
+        if (!isset($_SESSION['admin_id']) || ($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied');
+        }
+
+        $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+        $pdo = $db->getPdo();
+
+        // Check if data already seeded to prevent duplicate explosion
+        $count = $pdo->query("SELECT COUNT(*) FROM students")->fetchColumn();
+        if ($count > 5) {
+            header('Location: /admin?error=already_seeded');
+            exit;
+        }
+
+        // Insert Demo Fee Categories
+        $pdo->exec("INSERT INTO fee_categories (name, description, amount) VALUES 
+            ('Tuition Fee 2026', 'Annual tuition fee', 5000),
+            ('Library Fee', 'Library access fee', 200),
+            ('Hostel Fee', 'Semester hostel fee', 1200)
+        ");
+
+        $feeIds = $pdo->query("SELECT id, amount FROM fee_categories ORDER BY id DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
+
+        // Insert Demo Students & Transactions
+        for ($i = 1; $i <= 15; $i++) {
+            $name = "Demo Student " . $i;
+            $email = "student{$i}@example.com";
+            $roll = "DEMO-" . str_pad($i, 3, '0', STR_PAD_LEFT);
+            $pass = password_hash('password', PASSWORD_DEFAULT);
+            
+            $stmt = $pdo->prepare("INSERT INTO students (name, email, phone, password, roll_number) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$name, $email, '555-010'.$i, $pass, $roll]);
+            $studentId = $pdo->lastInsertId();
+
+            // Assign random fees
+            foreach ($feeIds as $fee) {
+                if (rand(1, 100) > 30) { // 70% chance to have this fee
+                    $status = (rand(1, 100) > 40) ? 'paid' : 'pending';
+                    $txStmt = $pdo->prepare("INSERT INTO transactions (student_id, fee_category_id, amount, status) VALUES (?, ?, ?, ?)");
+                    $txStmt->execute([$studentId, $fee['id'], $fee['amount'], $status]);
+                }
+            }
+        }
+
+        $this->logAction($pdo, "Seeded demo data successfully.");
+        header('Location: /admin?success=seeded');
+        exit;
     }
 
     public function updateSettings()
