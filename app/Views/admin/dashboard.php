@@ -30,15 +30,15 @@
         }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 transition-colors duration-300 h-screen overflow-hidden flex flex-col">
+<body class="bg-slate-50 dark:bg-slate-900 transition-colors duration-300 min-h-screen lg:h-screen lg:overflow-hidden flex flex-col">
     <!-- Navbar (Fixed height) -->
     <nav class="bg-slate-900 dark:bg-slate-950 text-white shadow-md p-4 shrink-0 transition-colors duration-300 z-50">
         <div class="max-w-[1920px] mx-auto flex justify-between items-center px-4">
-            <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
-                <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path></svg>
-                Admin Dashboard
+            <h1 class="text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2">
+                <svg class="w-6 h-6 md:w-8 md:h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path></svg>
+                <span class="hidden sm:inline">Admin Dashboard</span>
             </h1>
-            <div class="flex items-center gap-6">
+            <div class="flex items-center gap-4 md:gap-6">
                 <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-slate-800 transition-colors" title="Toggle Dark Mode">
                     <svg id="moon-icon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
                     <svg id="sun-icon" class="w-5 h-5 hidden text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
@@ -50,10 +50,10 @@
     </nav>
     
     <!-- Main 100vh App Layout -->
-    <div class="flex-1 overflow-hidden p-6 max-w-[1920px] mx-auto w-full flex gap-6">
+    <div class="flex-1 lg:overflow-hidden p-4 md:p-6 max-w-[1920px] mx-auto w-full flex flex-col lg:flex-row gap-6">
         
-        <!-- Left Sidebar: Navigation & Operations (Scrollable) -->
-        <div class="w-[280px] shrink-0 flex flex-col gap-6 overflow-y-auto custom-scrollbar pr-2 pb-6">
+        <!-- Left Sidebar: Navigation & Operations (Scrollable on Desktop) -->
+        <div class="w-full lg:w-[280px] shrink-0 flex flex-col gap-6 lg:overflow-y-auto custom-scrollbar lg:pr-2 lg:pb-6">
             
             <!-- Quick Navigation Menu -->
             <div class="bg-white dark:bg-slate-800 dark:border-slate-700 rounded-3xl shadow-sm border border-slate-100 p-4 flex flex-col gap-2">
@@ -120,8 +120,8 @@
             </div>
         </div>
 
-        <!-- Middle Column: Metrics & Analytics (Scrollable) -->
-        <div class="flex-1 flex flex-col gap-6 overflow-y-auto custom-scrollbar pr-2 pb-6 min-w-[400px]">
+        <!-- Middle Column: Metrics & Analytics (Scrollable on Desktop) -->
+        <div class="w-full lg:flex-1 flex flex-col gap-6 lg:overflow-y-auto custom-scrollbar lg:pr-2 lg:pb-6 min-w-0 lg:min-w-[400px]">
             
             <!-- Welcome Header -->
             <div class="shrink-0">
@@ -152,15 +152,15 @@
             </div>
         </div>
 
-        <!-- Right Column: Transactions List (Fixed Height, Internal Scroll) -->
-        <div class="w-[450px] shrink-0 bg-white dark:bg-slate-800 dark:border-slate-700 rounded-3xl shadow-sm border border-slate-100 flex flex-col overflow-hidden">
+        <!-- Right Column: Transactions List (Fixed Height Desktop, Auto Mobile) -->
+        <div class="w-full lg:w-[450px] shrink-0 bg-white dark:bg-slate-800 dark:border-slate-700 rounded-3xl shadow-sm border border-slate-100 flex flex-col lg:overflow-hidden mb-6 lg:mb-0">
             <!-- Header -->
-            <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800 shrink-0">
+            <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800 shrink-0 rounded-t-3xl">
                 <h3 class="text-lg font-bold text-slate-800 dark:text-white">Recent Transactions</h3>
             </div>
             
-            <!-- List Container (Scrollable) -->
-            <div class="flex-1 overflow-y-auto custom-scrollbar p-2">
+            <!-- List Container (Scrollable on Desktop) -->
+            <div class="lg:flex-1 lg:overflow-y-auto custom-scrollbar p-2">
                 <?php if (empty($recentTransactions)): ?>
                     <div class="p-8 text-center text-slate-500 dark:text-slate-400">No transactions found.</div>
                 <?php else: ?>
