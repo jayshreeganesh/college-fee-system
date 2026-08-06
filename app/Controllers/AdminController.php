@@ -508,6 +508,38 @@ class AdminController
         exit;
     }
 
+    public function deleteUser()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        if (($_SESSION['admin_role'] ?? '') !== 'super_admin') {
+            die('Access Denied: You do not have permission to perform this action.');
+        }
+
+        $id = $_GET['id'] ?? null;
+        if ($id && $id != $_SESSION['admin_id']) { // Prevent deleting yourself
+            $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+            $pdo = $db->getPdo();
+            
+            // Get username for audit log
+            $stmt = $pdo->prepare('SELECT username FROM admins WHERE id = ?');
+            $stmt->execute([$id]);
+            $username = $stmt->fetchColumn();
+
+            if ($username) {
+                $del = $pdo->prepare('DELETE FROM admins WHERE id = ?');
+                $del->execute([$id]);
+                $this->logAction($pdo, "Deleted admin account for username: {$username}");
+            }
+        }
+        
+        header('Location: /admin/users');
+        exit;
+    }
+
     public function settings()
     {
         if (!isset($_SESSION['admin_id']) || ($_SESSION['admin_role'] ?? '') !== 'super_admin') {

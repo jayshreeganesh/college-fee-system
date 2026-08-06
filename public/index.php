@@ -108,6 +108,9 @@ if ($uri === '/setup') {
     } else {
         $controller->addUser();
     }
+} elseif ($uri === '/admin/users/delete') {
+    $controller = new \App\Controllers\AdminController();
+    $controller->deleteUser();
 } elseif ($uri === '/receipt') {
     $controller = new \App\Controllers\ReceiptController();
     $controller->show();
