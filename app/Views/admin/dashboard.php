@@ -1,29 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($pageTitle ?? 'Admin Dashboard'); ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Outfit', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen">
-    <nav class="bg-slate-900 text-white shadow-md p-4">
+<body class="bg-slate-50 dark:bg-slate-900 transition-colors duration-300 min-h-screen">
+    <nav class="bg-slate-900 dark:bg-slate-950 text-white shadow-md p-4 sticky top-0 z-50 transition-colors duration-300">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold tracking-tight">Admin Dashboard</h1>
-            <a href="/logout" class="text-sm font-semibold hover:text-slate-300 transition-colors">Logout / Home</a>
+            <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path></svg>
+                Admin Dashboard
+            </h1>
+            <div class="flex items-center gap-6">
+                <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-slate-800 transition-colors" title="Toggle Dark Mode">
+                    <svg id="moon-icon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg id="sun-icon" class="w-5 h-5 hidden text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                </button>
+                <span class="text-sm font-semibold">Welcome, <span class="text-indigo-400"><?php echo htmlspecialchars($_SESSION['admin_role'] ?? 'Admin'); ?></span></span>
+                <a href="/logout" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-lg transition-colors text-sm font-semibold">Logout</a>
+            </div>
         </div>
     </nav>
     
     <div class="max-w-7xl mx-auto p-8 mt-4">
         <div class="flex justify-between items-center mb-8">
             <div>
-                <h2 class="text-3xl font-bold text-slate-800">Overview</h2>
-                <p class="text-slate-500 mt-1">Real-time statistics for the College Fee System</p>
+                <h2 class="text-3xl font-bold text-slate-800 dark:text-white">Overview</h2>
+                <p class="text-slate-500 dark:text-slate-400 mt-1">Real-time statistics for the College Fee System</p>
             </div>
             <div class="flex gap-4">
                 <?php if (($_SESSION['admin_role'] ?? '') === 'super_admin'): ?>
@@ -204,6 +219,33 @@
             var chart = new ApexCharts(document.querySelector("#revenueChart"), options);
             chart.render();
         });
+    </script>
+    <script>
+        // Dark Mode Logic
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateIcons(isDark);
+        }
+
+        function updateIcons(isDark) {
+            if(isDark) {
+                document.getElementById('moon-icon').classList.add('hidden');
+                document.getElementById('sun-icon').classList.remove('hidden');
+            } else {
+                document.getElementById('sun-icon').classList.add('hidden');
+                document.getElementById('moon-icon').classList.remove('hidden');
+            }
+        }
+
+        // Check Local Storage
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            updateIcons(true);
+        } else {
+            updateIcons(false);
+        }
     </script>
 </body>
 </html>

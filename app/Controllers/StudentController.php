@@ -82,4 +82,65 @@ class StudentController
         $pageTitle = "Student Portal - College Fee System";
         require_once BASE_PATH . '/app/Views/student/portal.php';
     }
+
+    public function checkout()
+    {
+        if (!isset($_SESSION['student_id'])) {
+            header('Location: /student/login');
+            exit;
+        }
+
+        $id = $_GET['id'] ?? null;
+        if (!$id) {
+            header('Location: /student');
+            exit;
+        }
+
+        $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+        $pdo = $db->getPdo();
+
+        // Fetch the pending transaction ensuring it belongs to this student
+        $stmt = $pdo->prepare('
+            SELECT t.*, f.name as fee_name 
+            FROM transactions t 
+            JOIN fee_categories f ON t.fee_category_id = f.id 
+            WHERE t.id = ? AND t.student_id = ? AND t.status = "pending"
+        ');
+        $stmt->execute([$id, $_SESSION['student_id']]);
+        $transaction = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$transaction) {
+            die('Invalid or already paid transaction.');
+        }
+
+        $pageTitle = "Secure Checkout - College Fee System";
+        require_once BASE_PATH . '/app/Views/student/checkout.php';
+    }
+
+    public function processPayment()
+    {
+        if (!isset($_SESSION['student_id'])) {
+            header('Location: /student/login');
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+                die('CSRF token validation failed.');
+            }
+
+            $id = $_POST['transaction_id'] ?? null;
+            if ($id) {
+                $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+                $pdo = $db->getPdo();
+
+                // Update to paid
+                $stmt = $pdo->prepare('UPDATE transactions SET status = "paid" WHERE id = ? AND student_id = ? AND status = "pending"');
+                $stmt->execute([$id, $_SESSION['student_id']]);
+            }
+        }
+        
+        header('Location: /student?payment=success');
+        exit;
+    }
 }

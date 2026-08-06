@@ -141,6 +141,12 @@ if ($uri === '/setup') {
 } elseif ($uri === '/student') {
     $controller = new \App\Controllers\StudentController();
     $controller->portal();
+} elseif ($uri === '/student/pay') {
+    $controller = new \App\Controllers\StudentController();
+    $controller->checkout();
+} elseif ($uri === '/student/pay/process') {
+    $controller = new \App\Controllers\StudentController();
+    $controller->processPayment();
 } else {
     http_response_code(404);
     require_once BASE_PATH . '/app/Views/errors/404.php';

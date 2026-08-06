@@ -33,6 +33,16 @@
             </div>
         </div>
 
+        <?php if(isset($_GET['payment']) && $_GET['payment'] === 'success'): ?>
+        <div class="mb-6 bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-r-xl flex justify-between items-center shadow-sm">
+            <div class="flex items-center gap-3">
+                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <p class="text-emerald-800 font-bold">Payment Processed Successfully! Your receipt is now available.</p>
+            </div>
+            <a href="/student" class="text-emerald-600 hover:text-emerald-800 font-bold">&times;</a>
+        </div>
+        <?php endif; ?>
+        
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             <!-- Metrics & Chart -->
@@ -80,7 +90,7 @@
                                     <?php if ($tx['status'] === 'paid'): ?>
                                         <a href="/receipt?id=<?php echo $tx['id']; ?>" target="_blank" class="inline-block mt-2 text-xs font-bold text-indigo-600 hover:text-indigo-800">View Receipt &rarr;</a>
                                     <?php else: ?>
-                                        <span class="inline-block mt-2 text-xs font-bold text-rose-500 uppercase">Pending</span>
+                                        <a href="/student/pay?id=<?php echo $tx['id']; ?>" class="inline-block mt-2 px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow-sm transition-all transform hover:-translate-y-0.5">Pay Now &rarr;</a>
                                     <?php endif; ?>
                                 </div>
                             </div>
