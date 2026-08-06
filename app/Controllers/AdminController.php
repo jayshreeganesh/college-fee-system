@@ -494,8 +494,15 @@ class AdminController
         $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
         $pdo = $db->getPdo();
 
+        $checkStmt = $pdo->prepare('SELECT COUNT(*) FROM admins WHERE username = ?');
+        $checkStmt->execute([$username]);
+        if ($checkStmt->fetchColumn() > 0) {
+            die('Error: An account with this username already exists.');
+        }
+
         $stmt = $pdo->prepare('INSERT INTO admins (username, password, role) VALUES (?, ?, ?)');
         $stmt->execute([$username, password_hash($password, PASSWORD_DEFAULT), $role]);
+        $this->logAction($pdo, "Created new admin account for username: {$username}");
 
         header('Location: /admin/users');
         exit;
