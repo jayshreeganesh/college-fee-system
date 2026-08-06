@@ -603,9 +603,9 @@ class AdminController
         header('Content-Disposition: attachment; filename="student_import_template.csv"');
         
         $output = fopen('php://output', 'w');
-        fputcsv($output, ['name', 'email', 'phone', 'password', 'roll_number']);
-        fputcsv($output, ['John Doe', 'john@example.com', '1234567890', 'password123', 'CS101']);
-        fputcsv($output, ['Jane Smith', 'jane@example.com', '0987654321', 'password123', 'CS102']);
+        fputcsv($output, ['enrollment_number', 'name', 'email', 'course', 'password']);
+        fputcsv($output, ['CS101', 'John Doe', 'john@example.com', 'B.Tech CS', 'password123']);
+        fputcsv($output, ['CS102', 'Jane Smith', 'jane@example.com', 'B.Tech IT', 'password123']);
         fclose($output);
         exit;
     }
@@ -616,7 +616,7 @@ class AdminController
             die('Access Denied');
         }
 
-        $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+        $db = new \App\Database\DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
         $pdo = $db->getPdo();
 
         // Check if data already seeded to prevent duplicate explosion
@@ -627,13 +627,13 @@ class AdminController
         }
 
         // Insert Demo Fee Categories
-        $pdo->exec("INSERT INTO fee_categories (name, description, amount) VALUES 
-            ('Tuition Fee 2026', 'Annual tuition fee', 5000),
-            ('Library Fee', 'Library access fee', 200),
-            ('Hostel Fee', 'Semester hostel fee', 1200)
+        $pdo->exec("INSERT OR IGNORE INTO fee_categories (name, amount) VALUES 
+            ('Tuition Fee 2026', 5000),
+            ('Library Fee', 200),
+            ('Hostel Fee', 1200)
         ");
 
-        $feeIds = $pdo->query("SELECT id, amount FROM fee_categories ORDER BY id DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
+        $feeIds = $pdo->query("SELECT id, amount FROM fee_categories ORDER BY id DESC LIMIT 3")->fetchAll(\PDO::FETCH_ASSOC);
 
         // Insert Demo Students & Transactions
         for ($i = 1; $i <= 15; $i++) {
@@ -641,17 +641,20 @@ class AdminController
             $email = "student{$i}@example.com";
             $roll = "DEMO-" . str_pad($i, 3, '0', STR_PAD_LEFT);
             $pass = password_hash('password', PASSWORD_DEFAULT);
+            $course = "B.Tech CS";
             
-            $stmt = $pdo->prepare("INSERT INTO students (name, email, phone, password, roll_number) VALUES (?, ?, ?, ?, ?)");
-            $stmt->execute([$name, $email, '555-010'.$i, $pass, $roll]);
+            $stmt = $pdo->prepare("INSERT OR IGNORE INTO students (enrollment_number, name, email, course, password) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$roll, $name, $email, $course, $pass]);
             $studentId = $pdo->lastInsertId();
 
-            // Assign random fees
-            foreach ($feeIds as $fee) {
-                if (rand(1, 100) > 30) { // 70% chance to have this fee
-                    $status = (rand(1, 100) > 40) ? 'paid' : 'pending';
-                    $txStmt = $pdo->prepare("INSERT INTO transactions (student_id, fee_category_id, amount, status) VALUES (?, ?, ?, ?)");
-                    $txStmt->execute([$studentId, $fee['id'], $fee['amount'], $status]);
+            if ($studentId) {
+                // Assign random fees
+                foreach ($feeIds as $fee) {
+                    if (rand(1, 100) > 30) { // 70% chance to have this fee
+                        $status = (rand(1, 100) > 40) ? 'paid' : 'pending';
+                        $txStmt = $pdo->prepare("INSERT INTO transactions (student_id, fee_category_id, amount, status) VALUES (?, ?, ?, ?)");
+                        $txStmt->execute([$studentId, $fee['id'], $fee['amount'], $status]);
+                    }
                 }
             }
         }
