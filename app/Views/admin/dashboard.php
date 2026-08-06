@@ -148,7 +148,7 @@
             <!-- Chart -->
             <div class="bg-white dark:bg-slate-800 dark:border-slate-700 p-6 rounded-3xl shadow-sm border border-slate-100 flex-1 flex flex-col min-h-[400px]">
                 <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2 shrink-0">Revenue by Fee Category</h3>
-                <div id="revenueChart" class="w-full flex-1 dark:opacity-90 min-h-[300px]"></div>
+                <div id="revenueChart" class="w-full flex-1 dark:opacity-90 min-h-[320px] pb-6"></div>
             </div>
         </div>
 
@@ -235,7 +235,11 @@
                 },
                 colors: ['#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'],
                 dataLabels: { enabled: false },
-                legend: { position: 'bottom' }
+                legend: { 
+                    position: 'bottom',
+                    offsetY: 8,
+                    itemMargin: { horizontal: 10, vertical: 5 }
+                }
             };
 
             var chart = new ApexCharts(document.querySelector("#revenueChart"), options);
