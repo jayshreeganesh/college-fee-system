@@ -136,11 +136,70 @@ class StudentController
 
                 // Update to paid
                 $stmt = $pdo->prepare('UPDATE transactions SET status = "paid" WHERE id = ? AND student_id = ? AND status = "pending"');
-                $stmt->execute([$id, $_SESSION['student_id']]);
+                if ($stmt->execute([$id, $_SESSION['student_id']])) {
+                    // Simulate Email Sending
+                    $studentStmt = $pdo->prepare('SELECT email FROM students WHERE id = ?');
+                    $studentStmt->execute([$_SESSION['student_id']]);
+                    $email = $studentStmt->fetchColumn();
+                    if ($email) {
+                        $logStmt = $pdo->prepare('INSERT INTO email_logs (recipient_email, subject, body) VALUES (?, ?, ?)');
+                        $logStmt->execute([
+                            $email,
+                            "Payment Receipt #{$id}",
+                            "<p>Your payment has been successfully processed.</p>"
+                        ]);
+                    }
+                }
             }
         }
         
         header('Location: /student?payment=success');
+        exit;
+    }
+
+    public function updateProfile()
+    {
+        if (!isset($_SESSION['student_id']) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /student/login');
+            exit;
+        }
+
+        if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+            die('CSRF token validation failed.');
+        }
+
+        $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+        $pdo = $db->getPdo();
+
+        $address = trim($_POST['address'] ?? '');
+        $phone = trim($_POST['phone'] ?? '');
+        $profile_image = null;
+
+        // Handle avatar upload
+        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (in_array($_FILES['avatar']['type'], $allowedTypes)) {
+                $ext = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
+                $filename = 'avatar_' . $_SESSION['student_id'] . '_' . time() . '.' . $ext;
+                $uploadDir = BASE_PATH . '/public/uploads/avatars/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+                if (move_uploaded_file($_FILES['avatar']['tmp_name'], $uploadDir . $filename)) {
+                    $profile_image = '/uploads/avatars/' . $filename;
+                }
+            }
+        }
+
+        if ($profile_image) {
+            $stmt = $pdo->prepare('UPDATE students SET address = ?, phone = ?, profile_image = ? WHERE id = ?');
+            $stmt->execute([$address, $phone, $profile_image, $_SESSION['student_id']]);
+        } else {
+            $stmt = $pdo->prepare('UPDATE students SET address = ?, phone = ? WHERE id = ?');
+            $stmt->execute([$address, $phone, $_SESSION['student_id']]);
+        }
+
+        header('Location: /student?profile=updated');
         exit;
     }
 }

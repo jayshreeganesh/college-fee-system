@@ -98,6 +98,9 @@ if ($uri === '/setup') {
 } elseif ($uri === '/admin/audit-logs') {
     $controller = new \App\Controllers\AdminController();
     $controller->auditLogs();
+} elseif ($uri === '/admin/emails') {
+    $controller = new \App\Controllers\AdminController();
+    $controller->emailLogs();
 } elseif ($uri === '/admin/users') {
     $controller = new \App\Controllers\AdminController();
     $controller->listUsers();
@@ -147,6 +150,9 @@ if ($uri === '/setup') {
 } elseif ($uri === '/student/pay/process') {
     $controller = new \App\Controllers\StudentController();
     $controller->processPayment();
+} elseif ($uri === '/student/profile/update') {
+    $controller = new \App\Controllers\StudentController();
+    $controller->updateProfile();
 } else {
     http_response_code(404);
     require_once BASE_PATH . '/app/Views/errors/404.php';
