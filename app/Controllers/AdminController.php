@@ -592,6 +592,38 @@ class AdminController
         require_once BASE_PATH . '/app/Views/admin/settings.php';
     }
 
+    public function sendReminders()
+    {
+        if (!isset($_SESSION['admin_id'])) {
+            header('Location: /login');
+            exit;
+        }
+
+        $db = new \App\Database\DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+        $pdo = $db->getPdo();
+
+        $stmt = $pdo->query("SELECT t.id, t.amount, s.name, s.email, f.name as fee_name 
+                             FROM transactions t 
+                             JOIN students s ON t.student_id = s.id 
+                             JOIN fee_categories f ON t.fee_category_id = f.id 
+                             WHERE t.status = 'pending'");
+        $pending = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        
+        $count = 0;
+        foreach ($pending as $row) {
+            $subject = "Fee Reminder: " . $row['fee_name'];
+            $body = "Dear " . $row['name'] . ",\n\nThis is a friendly reminder that your fee for " . $row['fee_name'] . " ($" . number_format($row['amount'], 2) . ") is currently pending. Please log in to your student portal to complete the payment at your earliest convenience.\n\nThank you,\nCollege Administration";
+            
+            $logStmt = $pdo->prepare("INSERT INTO email_logs (recipient_email, subject, body, sent_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)");
+            $logStmt->execute([$row['email'], $subject, $body]);
+            $count++;
+        }
+
+        $this->logAction($pdo, "Sent $count fee reminder emails.");
+        header('Location: /admin/emails?success=reminders_sent');
+        exit;
+    }
+
     public function downloadImportTemplate()
     {
         if (!isset($_SESSION['admin_id'])) {

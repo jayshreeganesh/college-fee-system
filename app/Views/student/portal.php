@@ -58,11 +58,55 @@
                     </div>
                 </div>
 
-                <!-- ApexChart Container -->
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4">Fee Overview</h3>
-                    <div id="studentChart" class="w-full h-64"></div>
+                <!-- Fee Analytics Chart -->
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-center items-center">
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">Fee Analytics</h3>
+                    <div id="studentFeeChart" class="w-full"></div>
                 </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var hasData = <?php echo ($totalPaid + $totalPending > 0) ? 'true' : 'false'; ?>;
+                        var options = {
+                            series: hasData ? <?php echo $chartSeries; ?> : [1],
+                            labels: hasData ? <?php echo $chartLabels; ?> : ['No Fees'],
+                            chart: {
+                                type: 'donut',
+                                height: 280,
+                                fontFamily: 'Outfit, sans-serif',
+                                background: 'transparent'
+                            },
+                            plotOptions: {
+                                pie: {
+                                    donut: {
+                                        size: '75%',
+                                        labels: {
+                                            show: true,
+                                            name: { color: '#64748b' },
+                                            value: { color: '#1e293b' },
+                                            total: {
+                                                show: true,
+                                                label: 'Total Fees',
+                                                color: '#64748b',
+                                                formatter: function (w) {
+                                                    return hasData ? '$' + w.globals.seriesTotals.reduce((a, b) => { return a + b }, 0).toLocaleString() : '$0';
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            colors: hasData ? ['#10B981', '#F43F5E'] : ['#e2e8f0'],
+                            dataLabels: { enabled: false },
+                            legend: { position: 'bottom', offsetY: 8, itemMargin: { horizontal: 10, vertical: 5 } },
+                            tooltip: { enabled: hasData }
+                        };
+
+                        var chart = new ApexCharts(document.querySelector("#studentFeeChart"), options);
+                        chart.render();
+                    });
+                </script>
+
             </div>
 
             <!-- Transaction History -->

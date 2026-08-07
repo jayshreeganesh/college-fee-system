@@ -79,6 +79,9 @@ class StudentController
         $stmtTx->execute([$studentId]);
         $transactions = $stmtTx->fetchAll(PDO::FETCH_ASSOC);
 
+        $chartSeries = json_encode([(float)$totalPaid, (float)$totalPending]);
+        $chartLabels = json_encode(['Paid', 'Pending']);
+
         $pageTitle = "Student Portal - College Fee System";
         require_once BASE_PATH . '/app/Views/student/portal.php';
     }

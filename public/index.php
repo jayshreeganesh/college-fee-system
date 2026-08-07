@@ -104,6 +104,9 @@ if ($uri === '/setup') {
 } elseif ($uri === '/admin/student/import/template') {
     $controller = new \App\Controllers\AdminController();
     $controller->downloadImportTemplate();
+} elseif ($uri === '/admin/send-reminders') {
+    $controller = new \App\Controllers\AdminController();
+    $controller->sendReminders();
 } elseif ($uri === '/admin/seed-demo-data') {
     $controller = new \App\Controllers\AdminController();
     $controller->seedDemoData();
