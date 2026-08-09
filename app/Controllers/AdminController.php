@@ -681,7 +681,15 @@ class AdminController
 
         $feeIds = $pdo->query("SELECT id, amount FROM fee_categories ORDER BY id DESC LIMIT 3")->fetchAll(\PDO::FETCH_ASSOC);
 
-        // Insert Demo Students & Transactions
+        // 1. Explicitly create 'demo_admin'
+        $demoAdminPass = password_hash('password', PASSWORD_DEFAULT);
+        $pdo->exec("INSERT OR IGNORE INTO admins (username, password, role) VALUES ('demo_admin', '{$demoAdminPass}', 'admin')");
+
+        // 2. Explicitly create the specific student 'CS2026-001'
+        $demoStudentPass = password_hash('password123', PASSWORD_DEFAULT);
+        $pdo->exec("INSERT OR IGNORE INTO students (enrollment_number, name, email, course, password) VALUES ('CS2026-001', 'Alice Smith', 'alice@example.com', 'Computer Science', '{$demoStudentPass}')");
+
+        // Insert Random Demo Students & Transactions
         for ($i = 1; $i <= 15; $i++) {
             $name = "Demo Student " . $i;
             $email = "student{$i}@example.com";
