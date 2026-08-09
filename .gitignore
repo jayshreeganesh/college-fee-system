@@ -6,3 +6,4 @@
 *.sqlite3
 .php-cs-fixer.cache
 node_modules/
+screenshots/
