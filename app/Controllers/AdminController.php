@@ -442,6 +442,7 @@ class AdminController
                 if (!$file->isDir()) {
                     $filePath = $file->getRealPath();
                     $relativePath = substr($filePath, strlen($projectPath) + 1);
+                    $relativePath = str_replace('\\', '/', $relativePath);
                     $zip->addFile($filePath, $relativePath);
                 }
             }
