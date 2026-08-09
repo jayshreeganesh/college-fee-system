@@ -76,7 +76,7 @@ class SetupController
                     recipient_email TEXT NOT NULL,
                     subject TEXT NOT NULL,
                     body TEXT NOT NULL,
-                    status TEXT NOT NULL DEFAULT "sent",
+                    status TEXT NOT NULL DEFAULT 'sent',
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 );
                 
