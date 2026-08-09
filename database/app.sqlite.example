@@ -1,0 +1,2 @@
+This is an example placeholder file for app.sqlite. 
+Run the command `php database/seeder.php` to generate the actual database schema and seed data.
