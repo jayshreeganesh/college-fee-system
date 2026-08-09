@@ -421,8 +421,12 @@ class AdminController
         if ($zip->open($zipFile, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === true) {
             $directory = new \RecursiveDirectoryIterator($projectPath, \RecursiveDirectoryIterator::SKIP_DOTS);
             $filter = new \RecursiveCallbackFilterIterator($directory, function ($current, $key, $iterator) {
-                $excludeDirs = ['.git', '.github', 'node_modules', 'vendor', 'screenshots', 'playwright-report', 'test-results'];
-                $excludeFiles = ['college-fee-system.zip', 'project_source_export.zip', 'app.sqlite', 'dump.php', 'database_backup.sqlite'];
+                $excludeDirs = ['.git', '.github', 'node_modules', 'vendor', 'screenshots', 'playwright-report', 'test-results', 'tests', '.phpunit.cache'];
+                $excludeFiles = [
+                    'college-fee-system.zip', 'project_source_export.zip', 'app.sqlite', 'dump.php', 
+                    'database_backup.sqlite', '.gitignore', '.php-cs-fixer.cache', '.php-cs-fixer.dist.php', 
+                    'package.json', 'package-lock.json', 'phpunit.xml', 'setup.lock'
+                ];
                 
                 if ($current->isDir() && in_array($current->getFilename(), $excludeDirs, true)) {
                     return false;
