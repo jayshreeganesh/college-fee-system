@@ -18,7 +18,7 @@ class FeeCategoryTest extends TestCase
         $this->pdo->exec('CREATE TABLE fee_categories (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
-            description TEXT NOT NULL
+            amount REAL NOT NULL
         )');
     }
 
@@ -26,7 +26,7 @@ class FeeCategoryTest extends TestCase
     {
         $category = new FeeCategory();
         $category->name = 'Tuition Fee';
-        $category->description = 'Standard tuition fee for the semester';
+        $category->amount = 5000.00;
 
         $result = $category->save($this->pdo);
 
@@ -38,6 +38,6 @@ class FeeCategoryTest extends TestCase
         $savedData = $stmt->fetch(\PDO::FETCH_ASSOC);
 
         $this->assertEquals('Tuition Fee', $savedData['name']);
-        $this->assertEquals('Standard tuition fee for the semester', $savedData['description']);
+        $this->assertEquals(5000.00, $savedData['amount']);
     }
 }
