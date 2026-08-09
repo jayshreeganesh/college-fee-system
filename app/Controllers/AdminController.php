@@ -428,7 +428,8 @@ class AdminController
                 $excludeFiles = [
                     'college-fee-system.zip', 'project_source_export.zip', 'app.sqlite', 'dump.php', 
                     'database_backup.sqlite', '.gitignore', '.php-cs-fixer.cache', '.php-cs-fixer.dist.php', 
-                    'package.json', 'package-lock.json', 'phpunit.xml', 'setup.lock', 'composer.json', 'composer.lock'
+                    'package.json', 'package-lock.json', 'phpunit.xml', 'setup.lock', 'composer.json', 'composer.lock',
+                    'linkedin_launch.md', 'create_pdf.js', 'College_Fee_System_Showcase.pdf'
                 ];
                 
                 if ($current->isDir() && in_array($current->getFilename(), $excludeDirs, true)) {
