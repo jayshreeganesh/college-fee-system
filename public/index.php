@@ -9,9 +9,23 @@ if (empty($_SESSION['csrf_token'])) {
 // 1. Define Base Path for easy file inclusion
 define('BASE_PATH', dirname(__DIR__));
 
-// 2. Load Composer Autoloader
-require_once BASE_PATH . '/vendor/autoload.php';
-
+// 2. Native PSR-4 Autoloader (No Composer Required for Production)
+spl_autoload_register(function ($class) {
+    $prefix = 'App\\';
+    $base_dir = BASE_PATH . '/app/';
+    $len = strlen($prefix);
+    
+    if (strncmp($prefix, $class, $len) !== 0) {
+        return;
+    }
+    
+    $relative_class = substr($class, $len);
+    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
+    
+    if (file_exists($file)) {
+        require $file;
+    }
+});
 // 3. Very Basic Router
 // In a real MVC, we use a Router class, but this demonstrates the concept
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
