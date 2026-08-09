@@ -22,7 +22,7 @@ jobs:
         coverage: none
 
     - name: Install Composer Dependencies
-      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      run: composer update -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
     - name: Initialize Test Database
       run: |
@@ -32,7 +32,7 @@ jobs:
       run: vendor/bin/phpunit
 
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '18'
 
@@ -42,18 +42,15 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
 
-    - name: Start PHP Server
-      run: php -S localhost:8000 -t public &
-      
-    - name: Wait for server to be ready
-      run: sleep 2
-
     - name: Run Playwright Tests
-      run: npx playwright test tests/e2e/screenshots.spec.js
+      run: |
+        php -S localhost:8000 -t public &
+        sleep 2
+        npx playwright test tests/e2e/screenshots.spec.js
 
     - name: Upload Screenshots Artifact
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: e2e-screenshots
         path: screenshots/
