@@ -8,17 +8,17 @@ class FeeCategory
 {
     public ?int $id = null;
     public string $name;
-    public string $description;
+    public float $amount;
 
     public function save(PDO $pdo): bool
     {
-        $sql = "INSERT INTO fee_categories (name, description) VALUES (:name, :description)";
+        $sql = "INSERT INTO fee_categories (name, amount) VALUES (:name, :amount)";
 
         $stmt = $pdo->prepare($sql);
 
         $result = $stmt->execute([
-            'name'        => $this->name,
-            'description' => $this->description,
+            'name'   => $this->name,
+            'amount' => $this->amount,
         ]);
 
         if ($result) {

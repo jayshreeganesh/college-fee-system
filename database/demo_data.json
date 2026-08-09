@@ -14,11 +14,11 @@
   "fee_categories": [
     {
       "name": "Tuition Fee",
-      "description": "Standard tuition fee for Fall 2026"
+      "amount": 5000.00
     },
     {
       "name": "Library Fee",
-      "description": "Annual library and resources fee"
+      "amount": 200.00
     }
   ],
   "students": [

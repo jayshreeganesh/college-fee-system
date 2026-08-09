@@ -1,0 +1,60 @@
+name: Tests
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: sqlite3, pdo_sqlite
+        coverage: none
+
+    - name: Install Composer Dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+    - name: Initialize Test Database
+      run: |
+        php database/seeder.php
+      
+    - name: Run PHPUnit Tests
+      run: vendor/bin/phpunit
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install NPM Dependencies
+      run: npm install
+
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+
+    - name: Start PHP Server
+      run: php -S localhost:8000 -t public &
+      
+    - name: Wait for server to be ready
+      run: sleep 2
+
+    - name: Run Playwright Tests
+      run: npx playwright test tests/e2e/screenshots.spec.js
+
+    - name: Upload Screenshots Artifact
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: e2e-screenshots
+        path: screenshots/
+        retention-days: 7

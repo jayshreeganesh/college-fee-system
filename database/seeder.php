@@ -46,7 +46,7 @@ $pdo->exec("
     CREATE TABLE fee_categories (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        description TEXT NOT NULL
+        amount REAL NOT NULL
     )
 ");
 
@@ -70,7 +70,7 @@ $pdo->exec("
         recipient_email TEXT NOT NULL,
         subject TEXT NOT NULL,
         body TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT "sent",
+        status TEXT NOT NULL DEFAULT 'sent',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -112,7 +112,7 @@ $categoryIds = [];
 foreach ($data['fee_categories'] as $cat) {
     $feeCat = new FeeCategory();
     $feeCat->name = $cat['name'];
-    $feeCat->description = $cat['description'];
+    $feeCat->amount = $cat['amount'];
     $feeCat->save($pdo);
     $categoryIds[] = $feeCat->id;
 }
