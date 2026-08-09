@@ -76,8 +76,3 @@ Want to run the project locally? It takes less than 60 seconds.
    - Student Portal: `http://localhost:8000/student/login`
 
 ---
-
-## 🤝 Open to Opportunities
-I am actively seeking Full-Stack and Backend Engineering roles. If your team values clean architecture, rigorous automated testing, and secure code, I would love to connect!
-
-*Built with ❤️ by Jayshree Ganesh.*
