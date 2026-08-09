@@ -23,6 +23,11 @@
             <div class="px-8 py-6 border-b border-slate-100 bg-slate-50/50">
                 <h2 class="text-2xl font-bold text-slate-800">Add New Student</h2>
                 <p class="text-slate-500 mt-1">Register a new student into the college system</p>
+                <?php if (isset($_GET['error']) && $_GET['error'] === 'duplicate'): ?>
+                    <div class="mt-4 p-4 bg-rose-50 text-rose-600 rounded-xl border border-rose-100 font-semibold text-sm">
+                        Error: A student with this Enrollment Number or Email Address already exists.
+                    </div>
+                <?php endif; ?>
             </div>
             <form action="/admin/student/add" method="POST" class="p-8 space-y-6">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">

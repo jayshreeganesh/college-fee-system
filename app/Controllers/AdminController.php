@@ -286,16 +286,19 @@ class AdminController
         $password = $_POST['password'] ?? '';
 
         if ($enrollment && $name && $email && $course && $password) {
-            $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
-            $pdo = $db->getPdo();
+            try {
+                $db = new DatabaseConnection('sqlite:' . dirname(__DIR__, 2) . '/database/app.sqlite');
+                $pdo = $db->getPdo();
 
-            // Hash the password
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-            // Using raw insert because we added password to schema but our active record Model doesn't explicitly map all fields if not defined
-            // Alternatively, just do raw insert for safety.
-            $stmt = $pdo->prepare('INSERT INTO students (enrollment_number, name, email, course, password) VALUES (?, ?, ?, ?, ?)');
-            $stmt->execute([$enrollment, $name, $email, $course, $hashedPassword]);
+                $stmt = $pdo->prepare('INSERT INTO students (enrollment_number, name, email, course, password) VALUES (?, ?, ?, ?, ?)');
+                $stmt->execute([$enrollment, $name, $email, $course, $hashedPassword]);
+            } catch (\PDOException $e) {
+                // If unique constraint fails, redirect back with error instead of 500 crash
+                header('Location: /admin/student/add?error=duplicate');
+                exit;
+            }
         }
 
         header('Location: /admin');

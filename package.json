@@ -15,5 +15,8 @@
   "type": "commonjs",
   "devDependencies": {
     "@playwright/test": "^1.62.1"
+  },
+  "dependencies": {
+    "pdf-lib": "^1.17.1"
   }
 }
